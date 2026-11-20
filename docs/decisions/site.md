@@ -65,9 +65,9 @@ controller, the coordinator, the statistician: 7–8 Nov 2026) and its palette (
 rules, changed as readers show otherwise, unlike the principles in AGENTS.md. A change to a page is checked
 against them.
 
-1. **One scale of letter sizes.** A size is a step of one scale; body text is 16 px; grey (`--ink-2`) is for what
-   is secondary. Not yet so: `site.css` has 36 sizes. Until a scale (`--t-*`) and a test that refuses a
-   size outside it are made, a change uses a size the stylesheet already has.
+1. **One scale of letter sizes.** A size is a step of the scale (`--t-1` … `--t-8`, `--t-h1`, `--t-d1` in
+   `site.css`, zailiprotiv's own); body text is 16 px; grey (`--ink-2`) is for what is secondary. A test
+   (`tests/test_design.py`) refuses a size outside the scale; an SVG's labels in px are the exception.
 2. **A colour means a kind of content, never a list's merit.** Navy for the brand and the data, gold for the one
    thing to look at, red only for warnings, teal for the lists; a list's own colour only on the settlement maps
    (`data/list_colours.csv`), with a key that names it. White text only on colours dark in both themes; any text
@@ -334,3 +334,12 @@ against them.
   Belgrade; a local round read from a municipality's documents stays on that municipality's and its stations'
   pages. Places to watch lost its worked example: one lede, and the four terms the table rests on set apart in a
   box (flag, elections flagged k / n, the same flag again, the cells).
+- **20 Nov 2026, one scale of letter sizes, as zailiprotiv's.** The maintainer asked for the site's design to be
+  closer to zailiprotiv's. Its type scale came first: `site.css` had 36 sizes, now every one is a step of the same
+  scale as zailiprotiv's (12.8, 14, 16, 18, 20, 24, 30, 36 px; the page's title `--t-h1` and the big numbers and
+  the home's headline `--t-d1` as clamps), each old size taken to the nearest step (0.95rem to 16 px, 0.925rem to
+  14 px, 1.6rem to 24 px …), headings set a little tighter (letter-spacing -0.015em), and `tests/test_design.py`
+  keeps it so. On phones the tabs stay 14 px so five fit a 390 px row. The palette of 8 Nov (navy header with the
+  gold rule) is unchanged: zailiprotiv's white header with a black rule, black ink and grey cards would replace
+  it, and that is the maintainer's choice. Checked at 320, 390 and 1280 px, both scripts, light and dark, on a
+  site built from round 680072: no page wider than its screen.
