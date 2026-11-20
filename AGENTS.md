@@ -34,6 +34,10 @@ it. Dates are the maintainer's decisions unless said otherwise.
     deleted.
   - Dependabot's monthly pull requests (the workflows' actions, the Python packages): merge them once their checks
     pass.
+  - **Worktrees go by `tools/pocisti.sh`** (from zailiprotiv, 20 Nov 2026), which `posalji.sh` runs after a merge:
+    a worktree with no changes whose pull request was squash-merged at its commit more than ten minutes ago. An
+    agent never removes its own worktree, and never by `git worktree remove`: Orca keeps the folder open, git
+    forgets the worktree and the folder stays behind (three did on 20 Nov 2026). `--proba` only lists.
 - **Workflows, safely** (20 Nov 2026, as in javni-uvid/zailiprotiv): every action pinned to a commit with its
   version in a comment beside it (Dependabot moves both); inputs and context reach scripts through `env`, never
   pasted into `run:` as `${{ }}`; a checkout keeps no token unless its job pushes (`persist-credentials: false`);
@@ -46,6 +50,12 @@ it. Dates are the maintainer's decisions unless said otherwise.
   `PYTHONUTF8=1` (the maintainer's computer has it for the user); the site's languages are then built one after
   another, and the suite took 42 minutes there on 20 Nov 2026, against some 4 on GitHub's runners. Paths kept to
   compare (`Site.produced`) are POSIX paths: with Windows' backslashes `finish()` removed every page in a folder.
+- **Measured, then changed** (from zailiprotiv, 20 Nov 2026). Work on speed or size starts from a measurement
+  (a profile, `--durations`, the site's size) and says the before and after. A change meant to keep the output
+  (a refactor, a faster count, a module moved) is checked by building the site before and after on the same data
+  and comparing every file; the pull request says how many differed and why.
+- **Secrets live in GitHub Secrets only** (the mail's SMTP settings). Never ask the maintainer to paste one in a
+  chat, and never print one in a log.
 - **Explain why in commit messages.** Say what changed for the site or the data, and the reason.
 - **Write the decision down** in its part's file under `docs/decisions/` (the map below), at the end of the
   section it belongs to, in the same commit as the change.
@@ -98,9 +108,9 @@ paragraph; a rule of work or a principle, here.
 |---|---|
 | The archive and its stores, fetching from RIK (endpoints, the calendar, incremental reads), the census, stations' settlements, places across elections, the acts on polling stations, Novi Sad's quarters | `docs/decisions/data.md` |
 | OCR: decisions on polling boards (controllers by list, layouts, kinds, placement, the reading's version), observers' records | `docs/decisions/boards.md` |
-| The site: pages and their order, Explore, the maps and the shared image, the palette, the guide, the incremental build, the size budget, hosting | `docs/decisions/site.md` |
+| The site: design rules, pages and their order, Explore, the maps and the shared image, the palette, the guide, the incremental build, the size budget, hosting | `docs/decisions/site.md` |
 | Local elections from the commissions' own documents: the municipal sites and the watch, classifying, the reports' readers, reading by eye | `docs/decisions/local.md` |
-| The workflows, their safety, and the tests | `docs/decisions/code.md` |
+| How the code is written, the workflows and their safety, the tests | `docs/decisions/code.md` |
 | The project's course, and decisions that span parts | `docs/decisions/log.md` |
 
 ## Known issues and open decisions

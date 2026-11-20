@@ -56,6 +56,39 @@ belongs to, in the same commit as the change. The principles and the rules of wo
   - Cloudflare Pages' free plan doesn't fit, with its limit of 20,000 files. Workers' paid plan (100,000 files) or
     a VPS are the fallback if the site outgrows 1 GB.
 
+## Design rules
+
+What the pages keep to (20 Nov 2026, taken at the maintainer's request from javni-uvid/zailiprotiv, whose rules
+came from looks at its site against WCAG 2.2, NN/g, GOV.UK, Stanford's credibility guidelines, the Trust Project
+and ProPublica's principles for news graphics), adapted to this site's readers (the curious visitor or
+controller, the coordinator, the statistician: 7–8 Nov 2026) and its palette (8 Nov 2026). They are working
+rules, changed as readers show otherwise, unlike the principles in AGENTS.md. A change to a page is checked
+against them.
+
+1. **One scale of letter sizes.** A size is a step of one scale; body text is 16 px; grey (`--ink-2`) is for what
+   is secondary. Not yet so: `site.css` has 36 sizes. Until a scale (`--t-*`) and a test that refuses a
+   size outside it are made, a change uses a size the stylesheet already has.
+2. **A colour means a kind of content, never a list's merit.** Navy for the brand and the data, gold for the one
+   thing to look at, red only for warnings, teal for the lists; a list's own colour only on the settlement maps
+   (`data/list_colours.csv`), with a key that names it. White text only on colours dark in both themes; any text
+   4.5:1 or more against its background.
+3. **The most important first.** A page says what it is and gives its main fact in the first screen (the latest
+   election first, the result before the details); then the reasons, then the details and the documents.
+4. **A number never stands alone.** It says what it is counted of, has something to compare it with (the
+   municipality, the country, the election before, similar settlements), and a way to how it is computed. Unknown
+   is not zero: a figure the data can't support is left out or said to be unknown.
+5. **A trend is drawn, a table is kept.** Where the point is how something changed, bars from zero come first and
+   the table follows (folded when long). No chart without its numbers.
+6. **The phone first.** Every change is looked at at 320 and 390 px in both scripts; no page is wider than its
+   screen; things to press are 44 px high; a long list shows its first rows and a way to the rest.
+7. **Everything can be checked.** Each figure leads to its RIK document or its rule; a warning says what to
+   check, never what happened (principle 2); nothing is ranked by preference (principle 1).
+8. **For every reader.** Keyboard and screen reader reach everything; every page works without its script
+   (`site.js` only adds); nothing moves by the clock that the reader can't stop; the reader is not addressed as a
+   man or a woman.
+9. **Measured, then changed.** The size budget and, once there are any, visit counts from the host or the edge
+   (principle 5) are read before a change to how a page is laid out, and after it.
+
 ## Decisions log
 
 - **5 Nov 2026:** the observer guide became the guide for controllers and observers, at the maintainer's request:
