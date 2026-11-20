@@ -27,3 +27,4 @@ packages = ["src/izbori"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["site: builds the whole site from the archive (tests/test_outputs.py): minutes on Linux, far longer on Windows"]

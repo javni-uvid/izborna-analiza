@@ -72,3 +72,8 @@ nothing was rewritten to meet them at once.
   `finish()` compared every file the same way, so on Windows `r\680072\index.html` was never among the pages
   written (`r/680072/index.html`) and was removed. Both now use `as_posix()`, as does `code_version`; on Linux
   nothing changes.
+- **20 Nov 2026, the site's tests left to the pull request on Windows.** Locally the suite took 40 minutes and more
+  on the maintainer's computer, twice stopped for want of memory; all but `tests/test_outputs.py` take a minute.
+  That module is marked `site`, and on Windows `tests/conftest.py` deselects it unless `-m` or
+  `IZBORI_SVI_TESTOVI=1` asks otherwise, so `posalji.sh` (osnova's, which runs `uv run pytest -q`) needs no option.
+  Where the time goes is in AGENTS.md; making the build faster on Windows is open.
