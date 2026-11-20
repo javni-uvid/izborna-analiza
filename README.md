@@ -503,6 +503,7 @@ Otherwise the station has none: unknown is not zero. Names are compared in Latin
    - for list elections, each list's `minority` status, taken from RIK's decisions, and then `"minority_checked": true` under `contest`. Until that is set, the site warns that seat numbers may be off.
    - for local elections, `contest.seats`, the size of the assembly
 5. **Commits:** scheduled commits come from GitHub's bot identity. People who commit by hand should use their GitHub no-reply address.
+6. **Working on the code:** changes reach `main` through a pull request, each task on its own branch in an Orca worktree (`orca.yaml` runs `uv sync` in a new one). In a new clone, `git config core.hooksPath tools/hooks` makes git refuse a push to `main`; `sh tools/posalji.sh <PR body file>` rebases, tests, pushes, opens the pull request, waits for **test** and squash-merges.
 
 ## Tests
 
