@@ -33,6 +33,6 @@ is added here, at the end of the section it belongs to, in the same commit as th
   four open findings were closed in the code: the two addresses `site.js` builds from the page's own values are
   used only as plain relative paths (`relPath`), Explore draws a view only when the address names one of its own,
   and a character class in `cli.py` lost a range the next one already held (the same letters). The repository's
-  settings are not yet `osnova/security.md`'s: all actions are allowed (not only GitHub's, by commit), and
-  secret scanning with push protection, Dependabot's security updates and private vulnerability reporting are
-  off. They are the maintainer's to switch on (an agent's attempt was refused by its permissions).
+  settings were not yet `osnova/security.md`'s; the maintainer switched them on the same evening: only GitHub's
+  own actions, pinned by commit; secret scanning with push protection; Dependabot's alerts and security updates;
+  private vulnerability reporting (checked through the API).
