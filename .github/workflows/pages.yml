@@ -8,10 +8,7 @@ on:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+permissions: {}  # each job asks for what it needs
 
 concurrency:
   group: pages
@@ -20,15 +17,20 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read  # configure-pages reads the Pages settings
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
           python-version: "3.12"
       # The previous build and its fingerprints: only pages whose data changed are rendered again (on election
       # night that is the round being counted). Changed code or templates rebuild everything.
       - name: Restore the previous build
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
         with:
           path: |
             _site
@@ -41,26 +43,29 @@ jobs:
           uv run izbori site --out _site --incremental
           du -sh --apparent-size _site
       - name: Keep this build for the next one
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
         with:
           path: |
             _site
             _site.state.json
           key: site-${{ github.run_id }}-${{ github.run_attempt }}
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
         with:
           path: _site
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write     # publish
+      id-token: write  # prove the publishing is this repository's
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346  # v5.0.1
         with:
           # GitHub sometimes takes over 10 minutes "syncing files" (three deploys on 9 Nov 2026 timed out at the
           # default 10 minutes, while the deploys around them took under 3)

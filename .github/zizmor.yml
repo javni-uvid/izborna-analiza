@@ -1,0 +1,16 @@
+# zizmor (the workflows' security check, security.yml). These workflows commit and push what they read or wrote
+# (the archive, documents, boards, observers, the crops' temporary branch), so their checkout keeps the token on
+# purpose; checkouts in jobs that don't push keep none.
+rules:
+  artipacked:
+    ignore:
+      - boards.yml
+      - census.yml
+      - documents.yml
+      - geo.yml
+      - history.yml
+      - local.yml
+      - observers.yml
+      - stations.yml
+      - update.yml
+      - watch.yml

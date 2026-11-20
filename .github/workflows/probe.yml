@@ -13,23 +13,29 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: read
+permissions: {}  # each job asks for what it needs
 
 jobs:
   probe:
     runs-on: ubuntu-latest
     timeout-minutes: 150
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
           python-version: "3.12"
       - name: List RIK's rounds
+        env:
+          REGISTER: ${{ inputs.register }}
+          REPORTS: ${{ inputs.reports }}
         run: |
           pip install uv && uv sync --frozen
           uv run izbori rounds
-          if [ "${{ inputs.reports }}" = "true" ]; then
+          if [ "$REPORTS" = "true" ]; then
             sudo apt-get update -qq && sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-srp tesseract-ocr-srp-latn poppler-utils >/dev/null
             uv run --with "numpy>=1.26" --with "opencv-python-headless>=4.9" izbori register --reports
-          elif [ "${{ inputs.register }}" = "true" ]; then uv run izbori register; fi
+          elif [ "$REGISTER" = "true" ]; then uv run izbori register; fi
