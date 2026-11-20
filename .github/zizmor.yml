@@ -11,6 +11,7 @@ rules:
       - history.yml
       - local.yml
       - observers.yml
+      - osnova.yml
       - stations.yml
       - update.yml
       - watch.yml

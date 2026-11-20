@@ -39,3 +39,7 @@ commit as the change. The principles and the rules of work are in AGENTS.md.
   decisions and the decisions log moved word for word to `docs/decisions/` by part (data, boards, site, local,
   code, log), each section to its part's file and each dated entry to the part it is mostly about, in the order
   it had. An entry that spans parts stays whole in the part of its main subject.
+- **20 Nov 2026:** the rules of work, the guards and the scripts this project shares with the organization's others
+  come from `javni-uvid/osnova` (the maintainer's decision): the **osnova** workflow copies them into `osnova/`,
+  `tools/posalji.sh`, `tools/pocisti.sh` and the pre-push hook only call the copy's, and AGENTS.md keeps what is
+  this project's own. The principles here stay whole and in force; `osnova/principles.md` is the common core.
