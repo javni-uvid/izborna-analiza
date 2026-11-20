@@ -6,9 +6,33 @@ in the same commit. README.md describes the project for its users; this file is 
 
 ## How to work here
 
-- **Commit straight to `main`.** No feature branches or pull requests (the maintainer's decision, 2 Nov 2026).
+- **A branch and a pull request per task** (20 Nov 2026, the maintainer's decision, as several agents work at once,
+  the way javni-uvid/zailiprotiv works; from 2 Nov 2026 until then everything was committed straight to `main`):
+  - **Each agent in an Orca worktree** of its own (`orca worktree create --name <task> --no-parent`, from the main
+    clone): Orca makes the branch, `<the maintainer's GitHub login>/<task>`, from `origin/main`, and the folder
+    under `~/orca/workspaces/izborna-analiza/`. Short-lived: hours, a day at most. Orca runs `uv sync` in a new
+    worktree itself (`orca.yaml`); `tzdata`, which Windows lacks, is a dependency there.
+  - **Before starting, `gh pr list`:** when an open pull request touches the same files, build on it or wait.
+  - **Before pushing,** `git rebase origin/main` and `uv run pytest -q`; then `gh pr create` (the template asks
+    what, why, what was checked, and whether the maintainer must decide); `gh pr checks --watch` until **test**
+    passes on it, then `gh pr merge --squash`: one commit on `main`, the branch deleted. `sh tools/posalji.sh <body
+    file>` does all of it in this order and waits for **test** to start before it counts as passed; `--ne-spajaj`
+    stops before the merge. A pull request that needs the maintainer (a principle, something seen from outside,
+    DNS, email) says so and is left for them to merge.
+  - **The workflows still commit data straight to `main`** (results, documents, boards, observers, state…): a
+    branch will lag behind in `data/`, which is fine while a task doesn't change `data/`. A task that must change
+    `data/` by hand rebases just before it merges.
+  - **`main` is guarded on our side:** GitHub's rulesets can't exempt the workflows' own token (GitHub Actions
+    can't be a ruleset's bypass actor), so a ruleset requiring pull requests would stop the hourly data runs. The
+    repository's ruleset only forbids deleting `main` and force-pushes; `tools/hooks/pre-push` refuses a push to
+    `main` from a clone set with `git config core.hooksPath tools/hooks` (its worktrees share it; a fix that can't
+    wait: `IZBORI_MAIN=1 git push origin main`). For the same reason GitHub's auto-merge can't be used (it needs a
+    required check), so the agent waits for **test** and merges. Squash is the only merge; merged branches are
+    deleted.
+  - Dependabot's monthly pull requests (the workflows' actions, the Python packages): merge them once their checks
+    pass.
 - **Run the whole test suite before every push:** `uv run pytest -q` (about 3 minutes). The **test** workflow runs
-  it again on every push; a red run is fixed before anything else.
+  it again on every pull request and on `main`; a red run is fixed before anything else.
 - **Explain why in commit messages.** Say what changed for the site or the data, and the reason.
 - **Update README.md with every feature:** the section that describes it, the archive layout, the commands, the
   module layout and the schedule, as they apply.
@@ -216,7 +240,7 @@ These are the project's promises to its readers. Never change them without the m
 | pages | on push | incremental site build and deploy |
 | geo | by hand | municipal boundaries from OpenStreetMap (Overpass); with kim, Kosovo and Metohija in RIK's division |
 | census | by hand | the 2022 census tables from the Statistical Office (RZS), into `data/census/2022/` |
-| test | on push | the whole test suite |
+| test | on every pull request and push to `main` | the whole test suite |
 
 A run started with `GITHUB_TOKEN` can dispatch another workflow (`gh workflow run`). That is how data runs start
 **pages**, and how a watch run starts the next **update** run.
@@ -924,4 +948,10 @@ A run started with `GITHUB_TOKEN` can dispatch another workflow (`gh workflow ru
   The repository's link (config's `REPO_URL`, shown on every page and in the user agent RIK and the geocoder see),
   the remote and the notes now name javni-uvid/izborna-analiza; GitHub redirects the old links meanwhile. The
   domain's `www` CNAME has to point to javni-uvid.github.io.
+- **20 Nov 2026, a branch and a pull request per task** (the maintainer's decision, replacing the rule of 2 Nov):
+  several agents work at once, each in its own Orca worktree, as in javni-uvid/zailiprotiv. `orca.yaml`,
+  `tools/posalji.sh`, `tools/hooks/pre-push`, the pull request's template and Dependabot came from there; the
+  repository allows only squash merges and deletes merged branches, and its ruleset `main` forbids deleting `main`
+  and force-pushes. The **test** workflow keeps no token in its checkout and a newer run on the same branch cancels
+  an older one. See *How to work here*.
 
