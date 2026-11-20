@@ -1365,8 +1365,16 @@
     drawnWidth = out.clientWidth;
     const p = problem();
     if (p) { setActions(null); say(p); return; }
-    const views = { map: drawMap, density: drawDensity, compare: drawCompare, hist: drawHist, table: drawTable, matrix: drawMatrix };
-    const res = (Object.prototype.hasOwnProperty.call(views, v) ? views[v] : drawTable)(ds);  // a view the address names, if it is one
+    let draw = drawTable;  // a view the address names, if it is one of these
+    switch (v) {
+      case 'map': draw = drawMap; break;
+      case 'density': draw = drawDensity; break;
+      case 'compare': draw = drawCompare; break;
+      case 'hist': draw = drawHist; break;
+      case 'matrix': draw = drawMatrix; break;
+      default: break;
+    }
+    const res = draw(ds);
     setActions(res);
     setTitle(res && !res.empty ? res : null);
     if (jump) { // a question was chosen: bring its answer into view where the form pushed it down
