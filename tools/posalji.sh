@@ -5,6 +5,7 @@
 # zailiprotiv, on 20 Nov 2026, a pull request was merged before its test began.
 #   sh tools/posalji.sh [<file with the PR body>] [--ne-spajaj]
 # --ne-spajaj stops after the check, for a pull request the maintainer merges (a principle, DNS, what is seen outside).
+# After a merge it runs tools/pocisti.sh: the worktrees whose pull requests were merged earlier go.
 set -eu
 body=""; merge=1
 for a in "$@"; do
@@ -16,6 +17,13 @@ done
 branch=$(git rev-parse --abbrev-ref HEAD)
 [ "$branch" = main ] && { echo "posalji: na main-u si; grana pa PR (AGENTS.md)." >&2; exit 1; }
 [ -z "$(git status --porcelain)" ] || { echo "posalji: ima izmena koje nisu commit-ovane." >&2; git status --short >&2; exit 1; }
+
+# On Windows an agent's shell may have started without the user's PYTHONUTF8 (AGENTS.md: the tests need it). Only
+# this one, only when unset, is read from the user's own Windows settings. Nothing is printed.
+user_var() { powershell.exe -NoProfile -NonInteractive -Command "[Environment]::GetEnvironmentVariable('$1','User')" 2>/dev/null | tr -d ''; }
+if command -v powershell.exe >/dev/null 2>&1; then
+  if [ -z "${PYTHONUTF8:-}" ] && [ "$(user_var PYTHONUTF8)" = 1 ]; then export PYTHONUTF8=1; fi
+fi
 
 git fetch -q origin
 git rebase -q origin/main
@@ -40,6 +48,7 @@ gh pr checks "$pr" | grep -q '^test[[:space:]]*pass' || { echo "posalji: test ni
 if [ "$merge" = 1 ]; then
   gh pr merge "$pr" --squash --delete-branch || gh pr view "$pr" --json state -q .state | grep -q MERGED
   echo "posalji: #$pr je spojen."
+  sh tools/pocisti.sh || echo "posalji: pocisti nije uspeo; worktree-ovi ostaju." >&2
 else
   echo "posalji: #$pr čeka održavaoca."
 fi
