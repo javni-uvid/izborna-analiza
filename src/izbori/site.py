@@ -990,8 +990,10 @@ class Site:
             shutil.rmtree(self.out)
         (self.out / "static").mkdir(parents=True, exist_ok=True)
         shutil.copytree(HERE / "static", self.out / "static", dirs_exist_ok=True)
-        self.produced.update(str(f.relative_to(self.out)) for f in (self.out / "static").rglob("*") if f.is_file()
-                             and (HERE / f.relative_to(self.out)).exists())
+        # pages are recorded by their POSIX path, on Windows too (20 Nov 2026: finish() took r\680072\index.html
+        # for a page no build produced, and removed every page in a folder)
+        self.produced.update(f.relative_to(self.out).as_posix() for f in (self.out / "static").rglob("*")
+                             if f.is_file() and (HERE / f.relative_to(self.out)).exists())
         self.put("static/labels.css", cell_labels())
         self.put(".nojekyll", "")
         self.cache: dict = {}
@@ -1188,7 +1190,7 @@ class Site:
         """Remove what no page produced any more (pages of places that no longer exist, old static files) and save
         the fingerprints for the next incremental build."""
         for f in sorted(self.out.rglob("*"), reverse=True):
-            rel = str(f.relative_to(self.out))
+            rel = f.relative_to(self.out).as_posix()
             if f.is_file() and rel not in self.produced:
                 f.unlink()
             elif f.is_dir() and not any(f.iterdir()):
@@ -1621,7 +1623,7 @@ def code_version() -> str:
     versions of the packages that render them. A change rebuilds every page."""
     h = hashlib.sha256()
     for f in sorted(p for p in HERE.rglob("*") if p.is_file() and "__pycache__" not in p.parts):
-        h.update(str(f.relative_to(HERE)).encode())
+        h.update(f.relative_to(HERE).as_posix().encode())
         h.update(f.read_bytes())
     for package in ("jinja2", "markupsafe"):
         h.update(f"{package}={version(package)}".encode())

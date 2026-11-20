@@ -39,7 +39,10 @@ in the same commit. README.md describes the project for its users; this file is 
   (zizmor; `.github/zizmor.yml` lists the accepted findings with the reason), the Python packages (pip-audit) and
   the code (CodeQL).
 - **Run the whole test suite before every push:** `uv run pytest -q` (about 3 minutes). The **test** workflow runs
-  it again on every pull request and on `main`; a red run is fixed before anything else.
+  it again on every pull request and on `main`; a red run is fixed before anything else. On Windows set
+  `PYTHONUTF8=1` (the maintainer's computer has it for the user); the site's languages are then built one after
+  another, and the suite took 42 minutes there on 20 Nov 2026, against some 4 on GitHub's runners. Paths kept to
+  compare (`Site.produced`) are POSIX paths: with Windows' backslashes `finish()` removed every page in a folder.
 - **Explain why in commit messages.** Say what changed for the site or the data, and the reason.
 - **Update README.md with every feature:** the section that describes it, the archive layout, the commands, the
   module layout and the schedule, as they apply.
@@ -967,3 +970,8 @@ A run started with `GITHUB_TOKEN` can dispatch another workflow (`gh workflow ru
   (boards' plan and read, local's classify, pages' build, probe, test), and permissions per job. The stations
   workflow lost `actions: write`: nothing in it starts another workflow. A **security** workflow runs actionlint,
   zizmor (the workflows that push accept `artipacked`), pip-audit and CodeQL.
+- **20 Nov 2026, the tests on Windows.** On the maintainer's computer 13 tests of `test_outputs.py` failed: the
+  site had no page in any folder. `Site.produced` recorded the static files by `str()` of their path and
+  `finish()` compared every file the same way, so on Windows `r\680072\index.html` was never among the pages
+  written (`r/680072/index.html`) and was removed. Both now use `as_posix()`, as does `code_version`; on Linux
+  nothing changes.
