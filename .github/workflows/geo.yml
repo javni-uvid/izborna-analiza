@@ -47,7 +47,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install
-        run: pip install uv && uv sync --frozen
+        run: pip install uv==0.13.9 && uv sync --frozen
       - name: Fetch the boundaries
         env:
           GH_TOKEN: ${{ github.token }}
@@ -62,7 +62,7 @@ jobs:
             exit 0
           fi
           if [ "$INSPECT" = "true" ]; then
-            uv run --with "pyshp>=2.3" izbori geo --kim-inspect
+            uv run --with "pyshp==3.1.9" izbori geo --kim-inspect
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -72,4 +72,4 @@ jobs:
           [ "$SETTLEMENTS" = "true" ] && args+=(--settlements)
           [ -n "$QUARTERS" ] && args+=(--quarters "$QUARTERS")
           [ "$COMMIT" = "true" ] && args+=(--commit --push --dispatch-pages)
-          uv run --with "shapely>=2.0" --with "pyshp>=2.3" izbori geo "${args[@]}"
+          uv run --with "shapely==2.2.0" --with "pyshp==3.1.9" izbori geo "${args[@]}"

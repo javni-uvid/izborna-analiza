@@ -76,4 +76,7 @@ nothing was rewritten to meet them at once.
   on the maintainer's computer, twice stopped for want of memory; all but `tests/test_outputs.py` take a minute.
   That module is marked `site`, and on Windows `tests/conftest.py` deselects it unless `-m` or
   `IZBORI_SVI_TESTOVI=1` asks otherwise, so `posalji.sh` (osnova's, which runs `uv run pytest -q`) needs no option.
-  Where the time goes is in AGENTS.md; making the build faster on Windows is open.
+  Measured that day: one build of the whole archive takes some 6 minutes there under a profiler (67,000 files,
+  1.9 GB at its peak), most of it Jinja rendering the places', the rounds' and the municipalities' pages, with the
+  two scripts built one after another (no `fork` on Windows); the module builds the whole archive once, the 2026
+  round again and two small rounds twelve times. Making the build faster on Windows is open.

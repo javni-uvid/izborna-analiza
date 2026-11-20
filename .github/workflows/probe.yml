@@ -33,9 +33,9 @@ jobs:
           REGISTER: ${{ inputs.register }}
           REPORTS: ${{ inputs.reports }}
         run: |
-          pip install uv && uv sync --frozen
+          pip install uv==0.13.9 && uv sync --frozen
           uv run izbori rounds
           if [ "$REPORTS" = "true" ]; then
             sudo apt-get update -qq && sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-srp tesseract-ocr-srp-latn poppler-utils >/dev/null
-            uv run --with "numpy>=1.26" --with "opencv-python-headless>=4.9" izbori register --reports
+            uv run --with "numpy==2.5.5" --with "opencv-python-headless==5.1.0.95" izbori register --reports
           elif [ "$REGISTER" = "true" ]; then uv run izbori register; fi

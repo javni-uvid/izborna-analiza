@@ -70,7 +70,7 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y -q tesseract-ocr tesseract-ocr-srp tesseract-ocr-srp-latn poppler-utils
       - name: Install
-        run: pip install uv && uv sync --frozen
+        run: pip install uv==0.13.9 && uv sync --frozen
       - name: Read the decisions every way, names masked
         env:
           ROUND: ${{ inputs.round }}
@@ -94,7 +94,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install
-        run: pip install uv && uv sync --frozen
+        run: pip install uv==0.13.9 && uv sync --frozen
       - name: Index the register and list what to read
         id: plan
         env:
@@ -147,7 +147,7 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y -q tesseract-ocr tesseract-ocr-srp tesseract-ocr-srp-latn poppler-utils
       - name: Install
-        run: pip install uv && uv sync --frozen
+        run: pip install uv==0.13.9 && uv sync --frozen
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
         with:
           name: plan
@@ -182,7 +182,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install
-        run: pip install uv && uv sync --frozen
+        run: pip install uv==0.13.9 && uv sync --frozen
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
         with:
           pattern: "*"

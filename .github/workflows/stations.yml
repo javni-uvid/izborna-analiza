@@ -35,7 +35,7 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y -q tesseract-ocr tesseract-ocr-srp tesseract-ocr-srp-latn poppler-utils
       - name: Install
-        run: pip install uv && uv sync --frozen
+        run: pip install uv==0.13.9 && uv sync --frozen
       - name: Read the decisions on polling stations
         env:
           REREAD: ${{ inputs.reread }}

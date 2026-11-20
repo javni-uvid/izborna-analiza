@@ -25,5 +25,5 @@ jobs:
           python-version: "3.12"
       - name: Test
         run: |
-          pip install uv && uv sync --frozen
+          pip install uv==0.13.9 && uv sync --frozen
           uv run pytest -q

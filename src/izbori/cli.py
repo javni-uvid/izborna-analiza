@@ -175,7 +175,7 @@ def report_shape(data: bytes, ocr: bool = True) -> str:
         info = subprocess.run(["pdfinfo", str(path)], capture_output=True, text=True).stdout
         pages = int((re.search(r"Pages:\s+(\d+)", info) or [0, 0])[1])
         text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True).stdout
-    letters = len(re.findall(r"[A-Za-zА-Яа-яЂ-џČĆŽŠĐčćžšđ]", text))
+    letters = len(re.findall(r"[A-Za-zЂ-џČĆŽŠĐčćžšđ]", text))
     kind = "text" if letters > 200 else "scan"
     if kind == "scan" and ocr:  # a scan's first two pages read as a report's are: upright, its ruled lines out
         from izbori import boards
