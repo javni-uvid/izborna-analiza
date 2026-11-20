@@ -11,6 +11,8 @@ import pytest
 from izbori import feed, mail, targets
 from izbori.site import build
 
+pytestmark = pytest.mark.site  # `pytest -m "not site"` leaves this module out (the default on Windows: conftest.py)
+
 CYRILLIC = re.compile(r"[Ѐ-ӿ]")
 
 

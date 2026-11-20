@@ -25,11 +25,18 @@ it. Dates are the maintainer's decisions unless said otherwise.
 - **Workflows, safely:** the rules are in `osnova/security.md`. Here a job asks for `contents: write` to commit,
   `actions: write` to start another workflow, `actions: read` for another run's artifacts; `.github/zizmor.yml`
   lists the accepted findings with the reason.
-- **The tests are `uv run pytest -q`** (about 3 minutes), the whole suite before every push. The **test** workflow runs
-  it again on every pull request and on `main`; a red run is fixed before anything else. On Windows set
-  `PYTHONUTF8=1` (the maintainer's computer has it for the user); the site's languages are then built one after
-  another, and the suite took 42 minutes there on 20 Nov 2026, against some 4 on GitHub's runners. Paths kept to
-  compare (`Site.produced`) are POSIX paths: with Windows' backslashes `finish()` removed every page in a folder.
+- **The tests are `uv run pytest -q`** (some 5 minutes on GitHub's runners), the whole suite before every push. The
+  **test** workflow runs it again on every pull request and on `main`; a red run is fixed before anything else. On
+  Windows set `PYTHONUTF8=1` (the maintainer's computer has it for the user). **On Windows the tests that build the
+  whole site are left out** (20 Nov 2026, the maintainer's decision, until the build is faster there):
+  `tests/conftest.py` makes `uv run pytest -q`, and so `posalji.sh`, run `-m "not site"` there (188 tests in a
+  minute); the 21 tests of `tests/test_outputs.py`, marked `site`, run on the pull request, and
+  `IZBORI_SVI_TESTOVI=1` runs them here too. Measured that day: one build of the whole archive takes some 6 minutes
+  there under a profiler (67,000 files, 1.9 GB at its peak), most of it Jinja rendering the places', the rounds'
+  and the municipalities' pages, with the two scripts built one after another (no `fork` on Windows); the module
+  builds the whole archive once, the 2026 round again and two small rounds twelve times, and took 40 minutes and
+  more, twice stopped for want of memory while other work ran. Paths kept to compare (`Site.produced`) are POSIX
+  paths: with Windows' backslashes `finish()` removed every page in a folder.
 - **Measured, then changed** (from zailiprotiv, 20 Nov 2026). Work on speed or size starts from a measurement
   (a profile, `--durations`, the site's size) and says the before and after. A change meant to keep the output
   (a refactor, a faster count, a module moved) is checked by building the site before and after on the same data
