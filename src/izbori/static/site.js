@@ -11,6 +11,9 @@
     return out.replace(/đ/g, 'dj').normalize('NFD').replace(/[̀-ͯ]/g, '');
   };
   const lang = document.documentElement.lang || 'en';
+  // An address built from the page's own values is used only when it is a plain relative path (osnova:
+  // security.md, addresses only from values checked here): no scheme, no other host.
+  const relPath = (s) => (/^[A-Za-z0-9._~\/-]*$/.test(s) && !s.startsWith('//') ? s : null);
 
   // On a phone the navigation rows scroll sideways: start with the current page's link in view.
   document.querySelectorAll('.round-nav, .main-nav').forEach((nav) => {
@@ -238,7 +241,8 @@
         back.hidden = !mc;
         if (mc) {
           const a = back.querySelector('a');
-          a.href = (form.dataset.munBase || '') + (mun.options[mun.selectedIndex].dataset.slug || ('m/' + mc + '.html'));
+          const href = relPath((form.dataset.munBase || '') + (mun.options[mun.selectedIndex].dataset.slug || ('m/' + mc + '.html')));
+          if (href !== null) a.href = href;
           a.textContent = back.dataset.text.replace('{mun}', mun.options[mun.selectedIndex].textContent);
         }
       }
@@ -403,7 +407,10 @@
   }
   document.querySelectorAll('form[data-pick-municipality]').forEach((form) => {
     const select = form.querySelector('select');
-    const go = () => { if (select.value) location.href = select.dataset.base + select.value; };
+    const go = () => {
+      const href = select.value && relPath((select.dataset.base || '') + select.value);
+      if (href) location.href = href;
+    };
     select.addEventListener('change', go);
     form.addEventListener('submit', (e) => { if (select.value) { e.preventDefault(); go(); } });
   });

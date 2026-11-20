@@ -39,7 +39,7 @@ jobs:
           restore-keys: site-
       - name: Build
         run: |
-          pip install uv && uv sync --frozen
+          pip install uv==0.13.9 && uv sync --frozen
           uv run izbori site --out _site --incremental
           du -sh --apparent-size _site
       - name: Keep this build for the next one

@@ -13,36 +13,24 @@ it. Dates are the maintainer's decisions unless said otherwise.
   (20 Nov 2026, the maintainer's decision; until then each project kept a hand-made copy of them here). A branch
   and a pull request per task in an Orca worktree, `gh pr list` before starting, `sh tools/posalji.sh <body file>`
   to ship, the decision written down in the same commit, why in the commit message, Serbian with the maintainer.
-  `osnova/security.md` holds the guards and `osnova/principles.md` the promises every project makes. The folder is
+  `osnova/security.md` holds the guards, and `osnova/principles.md` will hold the promises every project makes
+  (javni-uvid/osnova#1, open on 20 Nov 2026); this project's own stay whole below. The folder is
   a copy the **osnova** workflow brings from `javni-uvid/osnova`: a rule that should hold for every project is
   changed there, never in `osnova/` here. What follows is only this project's.
 - **A worktree** is under `~/orca/workspaces/izborna-analiza/`; Orca runs `uv sync` in a new one itself
   (`orca.yaml`); `tzdata`, which Windows lacks, is a dependency there. The workflows that commit data straight to
   `main` are results, documents, boards, observers, state and the like. A pull request that needs the maintainer
   here: a principle, something seen from outside, DNS, email.
-- **A decision goes at the end of the section it belongs to** in its part's file under `docs/decisions/` (the map
-  below). A rule of work or a principle of this project, here.
-- **Workflows, safely:** the rules are in `osnova/security.md`. Here a job asks for `contents: write` to commit,
+- **Workflows, safely:** the rules are in `osnova/security.md`, and what this project guards besides or accepts
+  as it is, in `docs/decisions/security.md`. Here a job asks for `contents: write` to commit,
   `actions: write` to start another workflow, `actions: read` for another run's artifacts; `.github/zizmor.yml`
   lists the accepted findings with the reason.
-- **The tests are `uv run pytest -q`** (some 5 minutes on GitHub's runners), the whole suite before every push. The
-  **test** workflow runs it again on every pull request and on `main`; a red run is fixed before anything else. On
-  Windows set `PYTHONUTF8=1` (the maintainer's computer has it for the user). **On Windows the tests that build the
-  whole site are left out** (20 Nov 2026, the maintainer's decision, until the build is faster there):
-  `tests/conftest.py` makes `uv run pytest -q`, and so `posalji.sh`, run `-m "not site"` there (188 tests in a
-  minute); the 21 tests of `tests/test_outputs.py`, marked `site`, run on the pull request, and
-  `IZBORI_SVI_TESTOVI=1` runs them here too. Measured that day: one build of the whole archive takes some 6 minutes
-  there under a profiler (67,000 files, 1.9 GB at its peak), most of it Jinja rendering the places', the rounds'
-  and the municipalities' pages, with the two scripts built one after another (no `fork` on Windows); the module
-  builds the whole archive once, the 2026 round again and two small rounds twelve times, and took 40 minutes and
-  more, twice stopped for want of memory while other work ran. Paths kept to compare (`Site.produced`) are POSIX
-  paths: with Windows' backslashes `finish()` removed every page in a folder.
-- **Measured, then changed** (from zailiprotiv, 20 Nov 2026). Work on speed or size starts from a measurement
-  (a profile, `--durations`, the site's size) and says the before and after. A change meant to keep the output
-  (a refactor, a faster count, a module moved) is checked by building the site before and after on the same data
-  and comparing every file; the pull request says how many differed and why.
-- **Secrets live in GitHub Secrets only** (the mail's SMTP settings). Never ask the maintainer to paste one in a
-  chat, and never print one in a log.
+- **The tests are `uv run pytest -q`** (some 5 minutes on GitHub's runners). On Windows set `PYTHONUTF8=1` (the
+  maintainer's computer has it for the user), and there the tests that build the whole site are left out
+  (20 Nov 2026, the maintainer's decision, until the build is faster there): `tests/conftest.py` deselects the
+  21 tests marked `site` (`tests/test_outputs.py`), which run on the pull request; `IZBORI_SVI_TESTOVI=1` runs
+  them here too. Why, with the measurements: *Tests* in `docs/decisions/code.md`.
+- **Secrets** are the mail's SMTP settings, in GitHub Secrets (`osnova/security.md`).
 - **Update README.md with every feature:** the section that describes it, the archive layout, the commands, the
   module layout and the schedule, as they apply.
 - **Ask RIK little.** A one-off full pass through a register is fine when a feature needs it. Recurring reads must
@@ -93,6 +81,7 @@ paragraph; a rule of work or a principle, here.
 | The site: design rules, pages and their order, Explore, the maps and the shared image, the palette, the guide, the incremental build, the size budget, hosting | `docs/decisions/site.md` |
 | Local elections from the commissions' own documents: the municipal sites and the watch, classifying, the reports' readers, reading by eye | `docs/decisions/local.md` |
 | How the code is written, the workflows and their safety, the tests | `docs/decisions/code.md` |
+| What this project guards besides `osnova/security.md`, and what it accepts as it is | `docs/decisions/security.md` |
 | The project's course, and decisions that span parts | `docs/decisions/log.md` |
 
 ## Known issues and open decisions

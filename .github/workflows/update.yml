@@ -34,7 +34,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install
-        run: pip install uv && uv sync --frozen
+        run: pip install uv==0.13.9 && uv sync --frozen
       - name: Check RIK, archive, publish
         env:
           GH_TOKEN: ${{ github.token }}

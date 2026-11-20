@@ -74,7 +74,7 @@ jobs:
       - name: Install
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-srp tesseract-ocr-srp-latn poppler-utils antiword >/dev/null
-          pip install uv && uv sync --frozen
+          pip install uv==0.13.9 && uv sync --frozen
       - name: Classify a part
         env:
           CLASSIFY: ${{ inputs.classify }}
@@ -109,7 +109,7 @@ jobs:
           python-version: "3.12"
       - name: Install
         if: ${{ always() }}
-        run: pip install uv && uv sync --frozen
+        run: pip install uv==0.13.9 && uv sync --frozen
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
         if: ${{ always() }}
         with:
@@ -138,7 +138,7 @@ jobs:
       - name: Install
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-srp tesseract-ocr-srp-latn poppler-utils antiword >/dev/null
-          pip install uv && uv sync --frozen
+          pip install uv==0.13.9 && uv sync --frozen
       - name: Boards
         if: ${{ inputs.results != '' && inputs.kind == 'boards' }}
         env:
@@ -165,7 +165,7 @@ jobs:
           args=(--commit --push)
           [ "$KIND" = check ] && args=(--no-corrections)
           # OpenCV takes a scanned table's ruled lines out before OCR (boards.unruled)
-          uv run --with "numpy>=1.26" --with "opencv-python-headless>=4.9" \
+          uv run --with "numpy==2.5.5" --with "opencv-python-headless==5.1.0.95" \
             izbori local --results "$RESULTS" --date "$DATE" --name "$NAME" --out crops "${args[@]}"
       - name: Keep the report pages to read on a temporary branch
         # a draft that isn't ready (stations set aside, or sums that aren't the commission's totals) leaves its
@@ -191,7 +191,7 @@ jobs:
           if [ "$KIND" = pages ]; then
             uv run izbori local --report-pages "$CODE" --path-has "$PATH_HAS" --out crops
           else
-            uv run --with "numpy>=1.26" --with "opencv-python-headless>=4.9" --with "scikit-learn>=1.4" \
+            uv run --with "numpy==2.5.5" --with "opencv-python-headless==5.1.0.95" --with "scikit-learn==1.9.1" \
               izbori local --crops "$CODE" --path-has "$PATH_HAS" --out crops --sheets
           fi
       - name: Keep the crops on a temporary branch
