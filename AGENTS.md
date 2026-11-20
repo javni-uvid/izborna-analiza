@@ -31,6 +31,13 @@ in the same commit. README.md describes the project for its users; this file is 
     deleted.
   - Dependabot's monthly pull requests (the workflows' actions, the Python packages): merge them once their checks
     pass.
+- **Workflows, safely** (20 Nov 2026, as in javni-uvid/zailiprotiv): every action pinned to a commit with its
+  version in a comment beside it (Dependabot moves both); inputs and context reach scripts through `env`, never
+  pasted into `run:` as `${{ }}`; a checkout keeps no token unless its job pushes (`persist-credentials: false`);
+  `permissions: {}` at the top and each job asks for the least it needs (`contents: write` to commit, `actions:
+  write` to start another workflow, `actions: read` for another run's artifacts). **security** checks all of this
+  (zizmor; `.github/zizmor.yml` lists the accepted findings with the reason), the Python packages (pip-audit) and
+  the code (CodeQL).
 - **Run the whole test suite before every push:** `uv run pytest -q` (about 3 minutes). The **test** workflow runs
   it again on every pull request and on `main`; a red run is fixed before anything else.
 - **Explain why in commit messages.** Say what changed for the site or the data, and the reason.
@@ -241,6 +248,7 @@ These are the project's promises to its readers. Never change them without the m
 | geo | by hand | municipal boundaries from OpenStreetMap (Overpass); with kim, Kosovo and Metohija in RIK's division |
 | census | by hand | the 2022 census tables from the Statistical Office (RZS), into `data/census/2022/` |
 | test | on every pull request and push to `main` | the whole test suite |
+| security | Mondays, on changes to the code or workflows (main and pull requests), by hand | actionlint, zizmor, pip-audit, CodeQL; reads only |
 
 A run started with `GITHUB_TOKEN` can dispatch another workflow (`gh workflow run`). That is how data runs start
 **pages**, and how a watch run starts the next **update** run.
@@ -954,4 +962,8 @@ A run started with `GITHUB_TOKEN` can dispatch another workflow (`gh workflow ru
   repository allows only squash merges and deletes merged branches, and its ruleset `main` forbids deleting `main`
   and force-pushes. The **test** workflow keeps no token in its checkout and a newer run on the same branch cancels
   an older one. See *How to work here*.
-
+- **20 Nov 2026, workflows hardened** (as zailiprotiv did on 17 Nov): actions pinned to commits at the versions
+  Dependabot's first pull request proposed (#4), `${{ }}` out of `run:`, no token kept by checkouts that don't push
+  (boards' plan and read, local's classify, pages' build, probe, test), and permissions per job. The stations
+  workflow lost `actions: write`: nothing in it starts another workflow. A **security** workflow runs actionlint,
+  zizmor (the workflows that push accept `artipacked`), pip-audit and CodeQL.

@@ -15,9 +15,7 @@ on:
         description: "Keep watching for up to this many minutes while a count is open"
         default: "345"
 
-permissions:
-  contents: write  # commit the archive
-  actions: write   # start the pages workflow
+permissions: {}  # each job asks for what it needs
 
 concurrency:
   group: update
@@ -27,9 +25,12 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 355
+    permissions:
+      contents: write  # commit the archive
+      actions: write   # start the pages workflow, and the next update run
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
           python-version: "3.12"
       - name: Install
@@ -44,10 +45,11 @@ jobs:
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
           MINUTES: ${{ inputs.minutes || '345' }}
+          EVENT: ${{ github.event_name }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           args=(--watch --max-minutes "$MINUTES" --commit --push --dispatch-pages --notify --rerun)
           # a run started by hand always asks RIK; scheduled runs ask less when no election is under way
-          [ "${{ github.event_name }}" = "workflow_dispatch" ] && args+=(--always)
+          [ "$EVENT" = "workflow_dispatch" ] && args+=(--always)
           uv run izbori update "${args[@]}"

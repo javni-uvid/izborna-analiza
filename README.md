@@ -370,6 +370,7 @@ The archive starts with the three files from 1 November 2026 at 22:19, 23:26 and
   - it runs for up to 5¾ hours.
 
   It then starts the next run itself, rather than wait for GitHub's schedule, and Sunday evenings get extra scheduled runs. Only one runs at a time.
+- **Every Monday, and on changes to the code or the workflows** (on `main` and in pull requests). The **security** workflow checks the workflows (actionlint, zizmor), the Python packages against known vulnerabilities (pip-audit, from `uv.lock`) and the code (CodeQL, its findings in the repository's Security tab). It reads only.
 - **Keepalive.** GitHub turns off schedules in repositories with no activity for 60 days. The hourly run commits a small heartbeat file if nothing else has been committed for 30 days.
 
 Requests to RIK stay small and identify the project in the User-Agent.
