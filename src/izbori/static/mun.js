@@ -137,6 +137,9 @@
   const clearActive = () => document.querySelectorAll('svg.smap .mp-active').forEach((x) => x.classList.remove('mp-active'));
   const closePanel = () => { shownSet = null; if (panel) panel.hidden = true; clearActive(); };
   function wire(map) {
+    // its settlements become buttons, so the map is a group of them rather than one picture (WCAG: no control
+    // inside an image); its label stays
+    map.setAttribute('role', 'group');
     map.querySelectorAll('path[data-set]').forEach((p) => { if (p.dataset.set) { p.setAttribute('tabindex', '0'); p.setAttribute('role', 'button'); } });
     const pick = (p) => {
       // the city settlement with a page of its own by quarters (Novi Sad): the click opens that page

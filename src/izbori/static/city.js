@@ -27,6 +27,9 @@
       + (m.stations.length > rows.length ? '<button type="button" class="link-button dev-more" data-panel-more>' + esc(fill(L.more, { n: num(m.stations.length - rows.length, 0) })) + '</button>' : '');
     panel.hidden = false;
   };
+  // its settlements become buttons, so the map is a group of them rather than one picture (no control inside an
+  // image); its label stays
+  smap.setAttribute('role', 'group');
   smap.querySelectorAll('path[data-set]').forEach((p) => { if (p.dataset.set) { p.setAttribute('tabindex', '0'); p.setAttribute('role', 'button'); } });
   const pick = (p) => {
     smap.querySelectorAll('.mp-active').forEach((x) => x.classList.remove('mp-active'));

@@ -15,6 +15,7 @@
 {% endfor %}{% block head %}{% endblock %}
 </head>
 <body>
+<a class="skip" href="#main">{{ t('skip_to_main') }}</a>
 <header class="top">
   <div class="wrap top-row">
     <a class="brand" href="{{ link('index.html') }}">{{ t('site_name') }}</a>
@@ -40,7 +41,7 @@
     </div>
   </div>
 </header>
-<main class="wrap">
+<main class="wrap" id="main" tabindex="-1">
 {% block main %}{% endblock %}
 </main>
 <footer class="wrap foot">
