@@ -228,6 +228,7 @@ S: dict[str, tuple[str, str]] = {
     "on_this_page": ("На овој страни", "On this page"),
     "nav_repeat": ("Места за праћење", "Places to watch"),
     "nav_main": ("Главни мени", "Main menu"),
+    "skip_to_main": ("Прескочи на садржај", "Skip to content"),
     "nav_elections": ("Избори", "Elections"),
     "nav_home": ("Почетна", "Home"),
     "nav_coord": ("За контролоре и координаторе", "For controllers and coordinators"),

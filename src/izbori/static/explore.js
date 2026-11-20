@@ -733,7 +733,7 @@
   };
 
   // --- charts -----------------------------------------------------------------------------------------------------
-  const FONT = 'IBM Plex Sans, system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+  const FONT = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
   const svgOpen = (W, H, label) => `<svg class="ex-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" `
     + `width="${W}" height="${H}" role="img" aria-label="${esc(label)}" font-family="${FONT}" font-size="12">`;
   const text = (x, y, s, attrs = '') => `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" ${attrs}>${esc(s)}</text>`;

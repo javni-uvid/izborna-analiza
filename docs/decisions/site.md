@@ -61,17 +61,19 @@ belongs to, in the same commit as the change. The principles and the rules of wo
 What the pages keep to (20 Nov 2026, taken at the maintainer's request from javni-uvid/zailiprotiv, whose rules
 came from looks at its site against WCAG 2.2, NN/g, GOV.UK, Stanford's credibility guidelines, the Trust Project
 and ProPublica's principles for news graphics), adapted to this site's readers (the curious visitor or
-controller, the coordinator, the statistician: 7–8 Nov 2026) and its palette (8 Nov 2026). They are working
+controller, the coordinator, the statistician: 7–8 Nov 2026) and, since 20 Nov 2026, zailiprotiv's look. They are working
 rules, changed as readers show otherwise, unlike the principles in AGENTS.md. A change to a page is checked
 against them.
 
 1. **One scale of letter sizes.** A size is a step of the scale (`--t-1` … `--t-8`, `--t-h1`, `--t-d1` in
    `site.css`, zailiprotiv's own); body text is 16 px; grey (`--ink-2`) is for what is secondary. A test
    (`tests/test_design.py`) refuses a size outside the scale; an SVG's labels in px are the exception.
-2. **A colour means a kind of content, never a list's merit.** Navy for the brand and the data, gold for the one
-   thing to look at, red only for warnings, teal for the lists; a list's own colour only on the settlement maps
-   (`data/list_colours.csv`), with a key that names it. White text only on colours dark in both themes; any text
-   4.5:1 or more against its background.
+2. **A colour means a kind of content, never a list's merit.** Black ink on a white page, grey for what is
+   secondary and for the cards, the data in grey and black (bars, meters, the Explore map's scale); red only for
+   warnings, each group of checks in its colour beside its name and symbol; a list's own colour only on the
+   settlement maps (`data/list_colours.csv`, with a key that names it) and the seats (by size). White text only on
+   colours dark in both themes. Text 4.5:1 or more against its background, a form control's edge 3:1, in both
+   themes: `tests/test_design.py` checks the tokens' pairs.
 3. **The most important first.** A page says what it is and gives its main fact in the first screen (the latest
    election first, the result before the details); then the reasons, then the details and the documents.
 4. **A number never stands alone.** It says what it is counted of, has something to compare it with (the
@@ -85,7 +87,9 @@ against them.
    check, never what happened (principle 2); nothing is ranked by preference (principle 1).
 8. **For every reader.** Keyboard and screen reader reach everything; every page works without its script
    (`site.js` only adds); nothing moves by the clock that the reader can't stop; the reader is not addressed as a
-   man or a woman.
+   man or a woman. The keyboard's place is outlined in ink on every element, the first Tab skips to the page
+   (`.skip`), and a reader who asked for less motion gets none; a map whose settlements are buttons is a group of
+   them, not an image. A change to a template is run through axe-core's WCAG 2.2 AA rules on every kind of page.
 9. **Measured, then changed.** The size budget and, once there are any, visit counts from the host or the edge
    (principle 5) are read before a change to how a page is laid out, and after it.
 
@@ -343,3 +347,20 @@ against them.
   gold rule) is unchanged: zailiprotiv's white header with a black rule, black ink and grey cards would replace
   it, and that is the maintainer's choice. Checked at 320, 390 and 1280 px, both scripts, light and dark, on a
   site built from round 680072: no page wider than its screen.
+- **20 Nov 2026, zailiprotiv's look, and an audit against the design rules.** The maintainer asked for the site to
+  look more like zailiprotiv and to follow every UX and UI principle; this replaces the palette of 8 Nov (navy
+  header, gold rule, teal for the lists) with zailiprotiv's newspaper look: a white page and black ink (`#111`,
+  dark `#f1f1ee` on `#111318`), grey (`#555`) for what is secondary, grey cards (`#f3f3f1`) with a 10 px radius, the
+  header white with a 3 px black rule as wide as the text, the name and headings in Literata 700 (served from the
+  site, OFL; IBM Plex Sans and Source Serif 4 are gone, the text is the reader's system font), black buttons,
+  table headers small and uppercase over a 2 px rule, form controls square with a `--ink-2` edge. The data went
+  from navy to grey and black, as zailiprotiv draws a count; "look here" (the big number, the doors' labels) is
+  ink; red stays the warnings' only, and the "unusual numbers" card is grey with its words in red. Why: one
+  organisation, one look, and the reader of either site knows how to read the other; zailiprotiv's look was
+  already held to the rules above. The audit (axe-core 4, WCAG 2.2 AA and best practice, every kind of page at
+  320 and 1280 px, light and dark, on a site built from round 567956): no contrast failure before or after; the
+  settlement map was an image holding buttons (now a group of them); there was no skip link, no focus style of
+  the site's own and no reduced-motion rule (all three added); on phones the sixth tab was cut off at the screen's
+  edge (the tabs now wrap to a second row). No page is wider than 320 px. The 404 page's targets look small only
+  when it is opened from disk (its stylesheet's address is the site's). Size: the test site grew 0.3% (the skip
+  link on every page), the fonts shrank from 14 files to 4.
