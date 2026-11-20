@@ -21,14 +21,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       # The previous build and its fingerprints: only pages whose data changed are rendered again (on election
       # night that is the round being counted). Changed code or templates rebuild everything.
       - name: Restore the previous build
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             _site
@@ -41,14 +41,14 @@ jobs:
           uv run izbori site --out _site --incremental
           du -sh --apparent-size _site
       - name: Keep this build for the next one
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: |
             _site
             _site.state.json
           key: site-${{ github.run_id }}-${{ github.run_attempt }}
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
@@ -60,7 +60,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
         with:
           # GitHub sometimes takes over 10 minutes "syncing files" (three deploys on 9 Nov 2026 timed out at the
           # default 10 minutes, while the deploys around them took under 3)

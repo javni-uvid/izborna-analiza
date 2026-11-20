@@ -64,10 +64,10 @@ jobs:
       matrix:
         shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.ref_name }}  # as it is when the job starts: with what an earlier run committed
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install
@@ -79,7 +79,7 @@ jobs:
           CLASSIFY: ${{ inputs.classify }}
           SHARD: ${{ matrix.shard }}
         run: uv run izbori local --classify "$CLASSIFY" --shard "$SHARD/8" --budget 320
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ always() }}
         with:
           name: classified-${{ matrix.shard }}
@@ -95,18 +95,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: ${{ always() }}
         with:
           ref: ${{ github.ref_name }}  # as it is when the job starts: with what an earlier run committed
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         if: ${{ always() }}
         with:
           python-version: "3.12"
       - name: Install
         if: ${{ always() }}
         run: pip install uv && uv sync --frozen
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         if: ${{ always() }}
         with:
           pattern: classified-*
@@ -125,8 +125,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install
