@@ -9,43 +9,23 @@ it. Dates are the maintainer's decisions unless said otherwise.
 
 ## How to work here
 
-- **A branch and a pull request per task** (20 Nov 2026, the maintainer's decision, as several agents work at once,
-  the way javni-uvid/zailiprotiv works; from 2 Nov 2026 until then everything was committed straight to `main`):
-  - **Each agent in an Orca worktree** of its own (`orca worktree create --name <task> --no-parent`, from the main
-    clone): Orca makes the branch, `<the maintainer's GitHub login>/<task>`, from `origin/main`, and the folder
-    under `~/orca/workspaces/izborna-analiza/`. Short-lived: hours, a day at most. Orca runs `uv sync` in a new
-    worktree itself (`orca.yaml`); `tzdata`, which Windows lacks, is a dependency there.
-  - **Before starting, `gh pr list`:** when an open pull request touches the same files, build on it or wait.
-  - **Before pushing,** `git rebase origin/main` and `uv run pytest -q`; then `gh pr create` (the template asks
-    what, why, what was checked, and whether the maintainer must decide); `gh pr checks --watch` until **test**
-    passes on it, then `gh pr merge --squash`: one commit on `main`, the branch deleted. `sh tools/posalji.sh <body
-    file>` does all of it in this order and waits for **test** to start before it counts as passed; `--ne-spajaj`
-    stops before the merge. A pull request that needs the maintainer (a principle, something seen from outside,
-    DNS, email) says so and is left for them to merge.
-  - **The workflows still commit data straight to `main`** (results, documents, boards, observers, state…): a
-    branch will lag behind in `data/`, which is fine while a task doesn't change `data/`. A task that must change
-    `data/` by hand rebases just before it merges.
-  - **`main` is guarded on our side:** GitHub's rulesets can't exempt the workflows' own token (GitHub Actions
-    can't be a ruleset's bypass actor), so a ruleset requiring pull requests would stop the hourly data runs. The
-    repository's ruleset only forbids deleting `main` and force-pushes; `tools/hooks/pre-push` refuses a push to
-    `main` from a clone set with `git config core.hooksPath tools/hooks` (its worktrees share it; a fix that can't
-    wait: `IZBORI_MAIN=1 git push origin main`). For the same reason GitHub's auto-merge can't be used (it needs a
-    required check), so the agent waits for **test** and merges. Squash is the only merge; merged branches are
-    deleted.
-  - Dependabot's monthly pull requests (the workflows' actions, the Python packages): merge them once their checks
-    pass.
-  - **Worktrees go by `tools/pocisti.sh`** (from zailiprotiv, 20 Nov 2026), which `posalji.sh` runs after a merge:
-    a worktree with no changes whose pull request was squash-merged at its commit more than ten minutes ago. An
-    agent never removes its own worktree, and never by `git worktree remove`: Orca keeps the folder open, git
-    forgets the worktree and the folder stays behind (three did on 20 Nov 2026). `--proba` only lists.
-- **Workflows, safely** (20 Nov 2026, as in javni-uvid/zailiprotiv): every action pinned to a commit with its
-  version in a comment beside it (Dependabot moves both); inputs and context reach scripts through `env`, never
-  pasted into `run:` as `${{ }}`; a checkout keeps no token unless its job pushes (`persist-credentials: false`);
-  `permissions: {}` at the top and each job asks for the least it needs (`contents: write` to commit, `actions:
-  write` to start another workflow, `actions: read` for another run's artifacts). **security** checks all of this
-  (zizmor; `.github/zizmor.yml` lists the accepted findings with the reason), the Python packages (pip-audit) and
-  the code (CodeQL).
-- **Run the whole test suite before every push:** `uv run pytest -q` (about 3 minutes). The **test** workflow runs
+- **The rules every javni-uvid project shares are in `osnova/`: read `osnova/work.md` before anything else**
+  (20 Nov 2026, the maintainer's decision; until then each project kept a hand-made copy of them here). A branch
+  and a pull request per task in an Orca worktree, `gh pr list` before starting, `sh tools/posalji.sh <body file>`
+  to ship, the decision written down in the same commit, why in the commit message, Serbian with the maintainer.
+  `osnova/security.md` holds the guards and `osnova/principles.md` the promises every project makes. The folder is
+  a copy the **osnova** workflow brings from `javni-uvid/osnova`: a rule that should hold for every project is
+  changed there, never in `osnova/` here. What follows is only this project's.
+- **A worktree** is under `~/orca/workspaces/izborna-analiza/`; Orca runs `uv sync` in a new one itself
+  (`orca.yaml`); `tzdata`, which Windows lacks, is a dependency there. The workflows that commit data straight to
+  `main` are results, documents, boards, observers, state and the like. A pull request that needs the maintainer
+  here: a principle, something seen from outside, DNS, email.
+- **A decision goes at the end of the section it belongs to** in its part's file under `docs/decisions/` (the map
+  below). A rule of work or a principle of this project, here.
+- **Workflows, safely:** the rules are in `osnova/security.md`. Here a job asks for `contents: write` to commit,
+  `actions: write` to start another workflow, `actions: read` for another run's artifacts; `.github/zizmor.yml`
+  lists the accepted findings with the reason.
+- **The tests are `uv run pytest -q`** (about 3 minutes), the whole suite before every push. The **test** workflow runs
   it again on every pull request and on `main`; a red run is fixed before anything else. On Windows set
   `PYTHONUTF8=1` (the maintainer's computer has it for the user); the site's languages are then built one after
   another, and the suite took 42 minutes there on 20 Nov 2026, against some 4 on GitHub's runners. Paths kept to
@@ -56,9 +36,6 @@ it. Dates are the maintainer's decisions unless said otherwise.
   and comparing every file; the pull request says how many differed and why.
 - **Secrets live in GitHub Secrets only** (the mail's SMTP settings). Never ask the maintainer to paste one in a
   chat, and never print one in a log.
-- **Explain why in commit messages.** Say what changed for the site or the data, and the reason.
-- **Write the decision down** in its part's file under `docs/decisions/` (the map below), at the end of the
-  section it belongs to, in the same commit as the change.
 - **Update README.md with every feature:** the section that describes it, the archive layout, the commands, the
   module layout and the schedule, as they apply.
 - **Ask RIK little.** A one-off full pass through a register is fine when a feature needs it. Recurring reads must
@@ -69,8 +46,6 @@ it. Dates are the maintainer's decisions unless said otherwise.
   printed on the form masked.
 - **Only one pending run per workflow.** Each workflow has a concurrency group; a second dispatch while one is
   pending cancels the pending one. Queue at most one run of a workflow at a time.
-- **Talk to the maintainer in Serbian** (Latin script), briefly and to the point. Code, comments and docs are in
-  English.
 
 ## Principles
 
