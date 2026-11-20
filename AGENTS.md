@@ -248,7 +248,7 @@ These are the project's promises to its readers. Never change them without the m
 | geo | by hand | municipal boundaries from OpenStreetMap (Overpass); with kim, Kosovo and Metohija in RIK's division |
 | census | by hand | the 2022 census tables from the Statistical Office (RZS), into `data/census/2022/` |
 | test | on every pull request and push to `main` | the whole test suite |
-| security | Mondays, on changes to the code or workflows, by hand | actionlint, zizmor, pip-audit, CodeQL; reads only |
+| security | Mondays, on changes to the code or workflows (main and pull requests), by hand | actionlint, zizmor, pip-audit, CodeQL; reads only |
 
 A run started with `GITHUB_TOKEN` can dispatch another workflow (`gh workflow run`). That is how data runs start
 **pages**, and how a watch run starts the next **update** run.
