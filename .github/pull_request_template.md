@@ -12,6 +12,6 @@
 <!-- "None needed", or what needs the maintainer: a principle, something seen from outside (the site's domain,
 email, Cloudflare), DNS. Such a pull request waits for them: no auto-merge. -->
 
-## AGENTS.md / README.md
+## Decisions / README.md
 
-<!-- The decision written down in AGENTS.md, the feature in README.md, or why none was needed. -->
+<!-- The decision written down in docs/decisions/ (a rule of work or a principle in AGENTS.md), the feature in README.md, or why none was needed. -->

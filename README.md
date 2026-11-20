@@ -442,6 +442,7 @@ src/izbori/
   site.py       static site builder, with templates/ and static/
 data/           the archive
 notes/          news notes per round, added by hand
+docs/decisions/ the decisions behind each part, for those who change it (AGENTS.md has the map)
 tests/
 ```
 
