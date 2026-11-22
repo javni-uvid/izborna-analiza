@@ -19,8 +19,11 @@ it. Dates are the maintainer's decisions unless said otherwise.
   changed there, never in `osnova/` here. What follows is only this project's.
 - **A worktree** is under `~/orca/workspaces/izborna-analiza/`; Orca runs `uv sync` in a new one itself
   (`orca.yaml`); `tzdata`, which Windows lacks, is a dependency there. The workflows that commit data straight to
-  `main` are results, documents, boards, observers, state and the like. A pull request that needs the maintainer
-  here: a principle, something seen from outside, DNS, email.
+  `main` are results, documents, boards, observers, state and the like.
+- **Every pull request is merged by its agent once test passes**, a principle's and what is seen from outside
+  too (22 Nov 2026, the maintainer's decision; otherwise than `osnova/work.md`, on purpose): the maintainer is
+  told what changed. A principle is still changed only by the maintainer's decision, and the settings of a
+  service (Cloudflare, GitHub's, the registrar) and its secrets stay the maintainer's, by hand.
 - **Workflows, safely:** the rules are in `osnova/security.md`, and what this project guards besides or accepts
   as it is, in `docs/decisions/security.md`. Here a job asks for `contents: write` to commit,
   `actions: write` to start another workflow, `actions: read` for another run's artifacts; `.github/zizmor.yml`
