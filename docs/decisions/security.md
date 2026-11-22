@@ -16,9 +16,9 @@ is added here, at the end of the section it belongs to, in the same commit as th
 
 ## Accepted as it is
 
-- **No security headers from the host.** izbornipodaci.rs points straight at GitHub Pages (DNS at Loopia), with
-  no Cloudflare in front, so the headers `osnova/security.md` sets at Cloudflare aren't sent; GitHub Pages
-  serves HTTPS only. They come with Cloudflare, if it is put in front (*Hosting* in `site.md`).
+- **Cloudflare's counting script** (`static.cloudflareinsights.com/beacon.min.js`) is the one script from another
+  server, on every page once the site token is set (principle 5's exception, 22 Nov 2026). The tests let exactly
+  that address through; `Permissions-Policy` keeps it from asking for what no page needs.
 - **`artipacked` for the workflows that push** (boards, census, documents, geo, history, local, observers,
   stations, update, watch): their checkout keeps the token to commit; `.github/zizmor.yml` lists them.
 - **OCR's system packages by name, not version** (tesseract with its Serbian data, poppler, antiword, from the
@@ -36,3 +36,7 @@ is added here, at the end of the section it belongs to, in the same commit as th
   settings were not yet `osnova/security.md`'s; the maintainer switched them on the same evening: only GitHub's
   own actions, pinned by commit; secret scanning with push protection; Dependabot's alerts and security updates;
   private vulnerability reporting (checked through the API).
+- **22 Nov 2026, Cloudflare in front.** The headers of `osnova/security.md` now come from Cloudflare's zone (set by
+  the maintainer by hand), with HSTS, so the accepted "no security headers from the host" is gone. **pages** purges
+  the zone's cache with `CLOUDFLARE_API_TOKEN`, a token that can only purge this one zone's cache; **visits** reads
+  the analytics with its own token, `CLOUDFLARE_ANALYTICS_TOKEN`, which can only read the account's analytics.

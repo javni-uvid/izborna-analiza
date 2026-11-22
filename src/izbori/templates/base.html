@@ -45,10 +45,13 @@
 {% block main %}{% endblock %}
 </main>
 <footer class="wrap foot">
-  <p>{{ t('footer_data') }}</p>
+  <p>{{ t('footer_data') }}{% if analytics %} {{ t('footer_visits') }}{% endif %}</p>
   <p><a href="{{ link('elections.html') }}">{{ t('nav_elections') }}</a> · <a href="{{ link('repeat.html') }}">{{ t('nav_repeat') }}</a> · <a href="{{ link('about.html') }}">{{ t('nav_about') }}</a> · <a href="{{ repo_url }}">{{ t('footer_code') }}</a> · <a href="{{ feed_href }}">{{ t('footer_feed') }}</a></p>
 </footer>
 <script src="{{ root }}static/site.js" defer></script>
+{% if analytics %}
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ analytics }}"}'></script>
+{% endif %}
 {% block scripts %}{% endblock %}
 </body>
 </html>

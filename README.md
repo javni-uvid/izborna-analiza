@@ -41,7 +41,7 @@ A Serbian version of this file (`README.sr.md`) will follow.
    - A news report about a specific polling station can be attached to it as a note, marked as unconfirmed.
    - A note never creates a flag or changes the ranking.
 4. **No personally identifying data, links to RIK instead.** RIK's results are station totals. Its documents name board members, observers and commission members; the site links to those documents and never records, re-hosts or transcribes the names, even though RIK publishes them.
-5. **Nothing from third parties.** No analytics, cookies, fonts or scripts from other servers.
+5. **Nothing from third parties.** No cookies, fonts or scripts from other servers, with one exception (22 Nov 2026): visits are counted by Cloudflare Web Analytics, without cookies and only as totals per page, when the build has its site token; the footer and the about page say so.
 
 ## What it does
 
@@ -371,6 +371,7 @@ The archive starts with the three files from 1 November 2026 at 22:19, 23:26 and
 
   It then starts the next run itself, rather than wait for GitHub's schedule, and Sunday evenings get extra scheduled runs. Only one runs at a time.
 - **Every Monday, and on changes to the code or the workflows** (on `main` and in pull requests). The **security** workflow checks the workflows (actionlint, zizmor), the Python packages against known vulnerabilities (pip-audit, from `uv.lock`) and the code (CodeQL, its findings in the repository's Security tab). It reads only.
+- **By hand.** The **visits** workflow prints what Cloudflare Web Analytics counted over the last hours (pages, where visitors came from, devices, countries, hours): sums only, without rows seen fewer than three times, since its log is public. It needs the secrets `CLOUDFLARE_ANALYTICS_TOKEN` (reads the account's analytics only) and `CLOUDFLARE_ACCOUNT_ID`.
 - **Keepalive.** GitHub turns off schedules in repositories with no activity for 60 days. The hourly run commits a small heartbeat file if nothing else has been committed for 30 days.
 
 Requests to RIK stay small and identify the project in the User-Agent.

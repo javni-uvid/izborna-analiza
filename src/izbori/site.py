@@ -19,7 +19,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup
 
-from izbori import boards, feed, maps, quarters, repeat, stats, svg
+from izbori import boards, config, feed, maps, quarters, repeat, stats, svg
 from izbori.checks import BY_CODE, CHECKS, GROUPS, RULES
 from izbori.config import REPO_URL, RIK_PUBLIC, SITE_URL
 from izbori.contests import Presidential, Proportional, contest_rules
@@ -99,6 +99,7 @@ class Site:
             "time": lambda v: fmt_time(v, loc), "date": lambda v: fmt_date(v, loc), "name": name,
             "kind_name": lambda k: kind_name(k, loc),
             "check_name": lambda c: check_name(c, loc), "check_rule": lambda c: check_rule(c, loc, RULES),
+            "analytics": config.ANALYTICS_TOKEN,
             "repo_url": REPO_URL, "rik_url": RIK_PUBLIC, "feed_href": root + ("feed.en.xml" if loc == "en"
                                                                               else "feed.sr.xml"),
             **extra,
@@ -1628,6 +1629,7 @@ def code_version() -> str:
     for package in ("jinja2", "markupsafe"):
         h.update(f"{package}={version(package)}".encode())
     h.update(platform.python_version().encode())
+    h.update(config.ANALYTICS_TOKEN.encode())  # set or changed: every page's script tag changes
     return h.hexdigest()[:16]
 
 

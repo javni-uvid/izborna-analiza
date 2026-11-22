@@ -47,12 +47,14 @@ belongs to, in the same commit as the change. The principles and the rules of wo
   - The municipality's lists keep to the documents of the vote. Decisions on polling boards are listed only on the
     place's page.
 - **Hosting:** GitHub Pages through Actions at **izbornipodaci.rs** (since 8 Nov 2026); the previous build is kept
-  in the Actions cache. The domain is registered at Loopia; its DNS has the four GitHub Pages A records for the
-  apex and `www` as a CNAME to javni-uvid.github.io (izborni-podaci.github.io until the organization's rename on 12 Nov
-  2026). The custom domain is set in the repository's Pages
+  in the Actions cache. The domain is registered at Loopia. Since 22 Nov 2026 its DNS is at Cloudflare, with
+  Cloudflare's proxy in front of the site: the four GitHub Pages A records for the apex and `www` as a CNAME to
+  javni-uvid.github.io, all proxied, SSL "Full (strict)", HSTS and the headers of `osnova/security.md`. Until then
+  Loopia had one of the four A records and `www` as an A record too. **pages** tells Cloudflare to forget the cached
+  files after each publishing (`CLOUDFLARE_API_TOKEN`, which can only purge this zone's cache, and the variable
+  `CLOUDFLARE_ZONE_ID`); a failure there is only a warning. The custom domain is set in the repository's Pages
   settings (an Actions deployment needs no CNAME file). `SITE_URL` in config.py is the only place the address
   lives in code: feeds, the 404 page, the mail and the map image's source line all take it from there.
-  - Possible later: Cloudflare in front for visitor counts at the edge.
   - Cloudflare Pages' free plan doesn't fit, with its limit of 20,000 files. Workers' paid plan (100,000 files) or
     a VPS are the fallback if the site outgrows 1 GB.
 
@@ -364,3 +366,10 @@ against them.
   edge (the tabs now wrap to a second row). No page is wider than 320 px. The 404 page's targets look small only
   when it is opened from disk (its stylesheet's address is the site's). Size: the test site grew 0.3% (the skip
   link on every page), the fonts shrank from 14 files to 4.
+- **22 Nov 2026, Cloudflare in front, and visits counted.** The maintainer moved the domain's DNS to Cloudflare,
+  with its proxy in front of GitHub Pages (as zailiprotiv's), and made principle 5's exception zailiprotiv has:
+  Cloudflare Web Analytics counts visits, without cookies and only as totals per page. Its script is on every page
+  only when the build has the site token (the repository's variable `CLOUDFLARE_ANALYTICS_SITE_TOKEN`; the token is
+  in `code_version`, so setting it rebuilds every page); the footer, the home page's "no tracking" and the about
+  page's principle say so, and say otherwise without it. **visits** reads the counts by hand (`tools/visits.py`,
+  from zailiprotiv's, asking only for this site's hosts).
