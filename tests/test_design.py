@@ -57,7 +57,8 @@ def test_text_and_controls_have_contrast_in_both_themes():
     dark = _tokens(root, fam_dark) | _tokens(CSS[CSS.index(":root[data-theme=\"dark\"]"):CSS.index("@media (prefers-color-scheme: dark)")])
     system = _tokens(root, fam_dark) | _tokens(CSS[CSS.index("@media (prefers-color-scheme: dark)"):CSS.index("* { box-sizing")])
     assert dark == system  # the two ways to the dark theme give the same colours
-    assert light["page"] == fam_light["ju-bg"] and dark["page"] == fam_dark["ju-bg"]  # the family's page
+    # this site's own colours, not the family's (22 Nov 2026, the maintainer's decision): the navy of 8 Nov 2026
+    assert (light["page"], light["ink"], light["brand"], dark["page"]) == ("#ffffff", "#0f1f33", "#1e3a5f", "#0b1526")
     text = [("ink", "page"), ("ink", "surface"), ("ink-2", "page"), ("ink-2", "surface"), ("link", "page"),
             ("critical", "page"), ("critical", "surface"), ("ink", "warn-track"), ("on-button", "button"),
             ("on-brand", "brand"), ("brick-accent", "brick"), ("sun", "ink-card"), ("accent", "page")]
