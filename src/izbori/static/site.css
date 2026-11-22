@@ -1,35 +1,38 @@
-/* Izborni podaci. One look everywhere, a newspaper's, as zailiprotiv's (20 Nov 2026): Literata for headings
-   (served from the site), the system's sans for everything else; a white page, black ink, grey for what is
-   secondary, grey cards. Colour means a kind of content, never a list or a party: red only for warnings (each
-   group of checks has its colour, always beside the check's name and symbol), the data in grey and black (bars,
-   meters, trend lines), the lists' own colours only on the settlement maps and the seats, by size. */
+/* Izborni podaci. One look everywhere: the family's fonts (osnova.css), this site's own colours (the palette of
+   8 Nov 2026, back on 22 Nov 2026 at the maintainer's decision after two days of zailiprotiv's black and white).
+   Light: white page, navy ink and navy for the data (bars, meters, trend lines), gold for the one thing
+   on a page that should catch the eye, red only for warnings. Dark: the same roles on a night-navy page.
+   Colour means the kind of content, never a list or a party: a red cell is a warning, a navy bar is a
+   number, a gold border is "look here". Flags carry a symbol per check (shape) in the colour of their
+   group, always next to the check's name. Seats use a validated categorical palette, assigned by size.
+   Javni uvid's bar keeps the family's own colours (--ju-*), which this file doesn't touch. */
 :root {
   color-scheme: light;
-  /* the page's base colours, fonts and sizes are the family's (osnova.css, loaded first: 22 Nov 2026) */
-  --page: var(--ju-bg);
-  --surface: var(--ju-card);
-  --ink: var(--ju-fg);
-  --ink-2: var(--ju-muted);
-  --grid: #e6e6e3;
-  --axis: #b8b8b4;
+  /* the page's colours are this site's own, not the family's (22 Nov 2026): fonts and sizes are osnova.css's */
+  --page: #ffffff;
+  --surface: #eef2f7;
+  --ink: #0f1f33;
+  --ink-2: #44607f;
+  --grid: #e5ebf2;
+  --axis: #b9c9dc;
   --mp-none: #e6e3de;
-  --border: var(--ju-line);
-  --link: #111111;
-  --link-hover: #555555;
-  /* the header and the buttons: white and black, as zailiprotiv's */
-  --brand: #ffffff; --brand-2: #111111; --on-brand: #111111; --button: #111111; --on-button: #ffffff;
-  /* data: grey and black; "look here": ink; warnings: red */
-  --accent: #3d3d3d;
-  --accent-track: #e6e6e3;
-  --gold: #111111; --gold-ink: #111111;
+  --border: #c5d2e2;
+  --link: #1e3a5f;
+  --link-hover: #8a6610;
+  /* the brand bar and buttons */
+  --brand: #1e3a5f; --brand-2: #c5d2e2; --on-brand: #ffffff; --button: #1e3a5f; --on-button: #ffffff;
+  /* data: navy; emphasis: gold; warnings: red */
+  --accent: #1e3a5f;
+  --accent-track: #dbe4ee;
+  --gold: #c9971c; --gold-ink: #8a6610;
   --critical: #b42318;
   --warn-track: #fbe5e2;
   --serious: #6e40c9;
   --warning: #b45309;
   --records: #1d6fb8;
-  /* the cards on the home page: grey, one black, the warnings' red only for unusual numbers */
-  --sand: #f3f3f1; --sand-ink: #111111; --brick: #f3f3f1; --brick-ink: #111111; --brick-accent: #b42318;
-  --teal: #f3f3f1; --teal-ink: #111111; --ink-card: #111111; --ink-card-2: #d9d9d9; --sun: #ffffff;
+  /* the cards on the home page: colour by kind of content */
+  --sand: #eef2f7; --sand-ink: #8a6610; --brick: #b42318; --brick-ink: #ffd9d4; --brick-accent: #ffd9d4;
+  --teal: #e7f3f1; --teal-ink: #0f766e; --ink-card: #1e3a5f; --ink-card-2: #c5d2e2; --sun: #e4b94a;
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
   --s5: #e87ba4; --s6: #008300; --s7: #6250d6; --s8: #e34948;
   /* The one scale of letter sizes (20 Nov 2026, as zailiprotiv's): every font-size in this file is one of these
@@ -43,26 +46,26 @@
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --grid: #262a31; --axis: #4a505c; --mp-none: #3b3a38;
-  --link: #f1f1ee; --link-hover: #a8adb8;
-  --brand: #111318; --brand-2: #f1f1ee; --on-brand: #f1f1ee; --button: #f1f1ee; --on-button: #111318;
-  --accent: #c9c9c4; --accent-track: #2a2e36; --gold: #f1f1ee; --gold-ink: #f1f1ee;
+  --page: #0b1526; --surface: #12213a; --ink: #e8eef6; --ink-2: #a9b9cc; --grid: #1f3250; --axis: #3a5578; --mp-none: #3b3a38;
+  --border: #2a4060; --link: #e8eef6; --link-hover: #e4b94a;
+  --brand: #142a47; --brand-2: #a9b9cc; --on-brand: #ffffff; --button: #142a47; --on-button: #ffffff;
+  --accent: #7fa6d6; --accent-track: #1f3250; --gold: #e4b94a; --gold-ink: #e4b94a;
   --critical: #ff8a65; --warn-track: #4a1f1a; --serious: #c4a7ff; --warning: #f2a33a; --records: #6cb4f0;
-  --sand: #1b1e25; --sand-ink: #f1f1ee; --brick: #1b1e25; --brick-ink: #f1f1ee; --brick-accent: #ff8a65;
-  --teal: #1b1e25; --teal-ink: #f1f1ee; --ink-card: #f1f1ee; --ink-card-2: #30343c; --sun: #111318;
+  --sand: #1a2740; --sand-ink: #e4b94a; --brick: #6b1a12; --brick-ink: #ffd9d4; --brick-accent: #ffd9d4;
+  --teal: #12302d; --teal-ink: #5fd2c2; --ink-card: #e8eef6; --ink-card-2: #44607f; --sun: #8a6610;
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
   --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --grid: #262a31; --axis: #4a505c; --mp-none: #3b3a38;
-    --link: #f1f1ee; --link-hover: #a8adb8;
-    --brand: #111318; --brand-2: #f1f1ee; --on-brand: #f1f1ee; --button: #f1f1ee; --on-button: #111318;
-    --accent: #c9c9c4; --accent-track: #2a2e36; --gold: #f1f1ee; --gold-ink: #f1f1ee;
+    --page: #0b1526; --surface: #12213a; --ink: #e8eef6; --ink-2: #a9b9cc; --grid: #1f3250; --axis: #3a5578; --mp-none: #3b3a38;
+    --border: #2a4060; --link: #e8eef6; --link-hover: #e4b94a;
+    --brand: #142a47; --brand-2: #a9b9cc; --on-brand: #ffffff; --button: #142a47; --on-button: #ffffff;
+    --accent: #7fa6d6; --accent-track: #1f3250; --gold: #e4b94a; --gold-ink: #e4b94a;
     --critical: #ff8a65; --warn-track: #4a1f1a; --serious: #c4a7ff; --warning: #f2a33a; --records: #6cb4f0;
-    --sand: #1b1e25; --sand-ink: #f1f1ee; --brick: #1b1e25; --brick-ink: #f1f1ee; --brick-accent: #ff8a65;
-    --teal: #1b1e25; --teal-ink: #f1f1ee; --ink-card: #f1f1ee; --ink-card-2: #30343c; --sun: #111318;
+    --sand: #1a2740; --sand-ink: #e4b94a; --brick: #6b1a12; --brick-ink: #ffd9d4; --brick-accent: #ffd9d4;
+    --teal: #12302d; --teal-ink: #5fd2c2; --ink-card: #e8eef6; --ink-card-2: #44607f; --sun: #8a6610;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
     --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
   }
@@ -99,27 +102,27 @@ table.cm td:first-child { min-width: 11em; }
 table.cm th { white-space: normal; vertical-align: bottom; }
 code { font-size: 0.85em; }
 
-/* header, as zailiprotiv's: the name in Literata, the sections in ink, a 3 px black rule under the row */
-header.top { background: var(--brand); color: var(--on-brand); padding: 0 24px; }
-/* the rule is as wide as the page's text, not the window */
-.top-row.wrap { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 24px; max-width: 1072px; padding: 12px 0 8px; border-bottom: 3px solid var(--ink); }
+/* header: name, six sections, search and one small menu for language, script and theme; navy with a gold rule
+   (8 Nov 2026, back on 22 Nov 2026) */
+header.top { background: var(--brand); color: var(--on-brand); border-bottom: 3px solid var(--gold); }
+.top-row { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 28px; padding-top: 10px; padding-bottom: 10px; }
 .brand { font-family: var(--serif); font-weight: 700; font-size: var(--t-6); letter-spacing: -0.01em; color: var(--on-brand); text-decoration: none; margin-right: auto; }
-.main-nav { display: flex; gap: 4px 18px; flex-wrap: wrap; }
-.main-nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--brand-2); text-decoration: none; font-weight: 500; font-size: var(--t-3); }
-.main-nav a[aria-current] { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 7px; }
-.main-nav a:hover { color: var(--link-hover); }
+.main-nav { display: flex; gap: 4px 22px; flex-wrap: wrap; }
+.main-nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--brand-2); text-decoration: none; font-size: var(--t-3); }
+.main-nav a[aria-current] { color: var(--on-brand); font-weight: 600; text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 2px; text-underline-offset: 7px; }
+.main-nav a:hover { color: var(--on-brand); }
 @media (max-width: 1150px) {  /* six sections: the long names give way to short ones before the row wraps */
   .main-nav a[data-short] { font-size: 0; }
   .main-nav a[data-short]::after { content: attr(data-short); font-size: var(--t-3); }
 }
 .top-tools { display: flex; align-items: center; gap: 4px; }
 .icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--on-brand); }
-.icon-btn:hover { color: var(--link-hover); }
+.icon-btn:hover { color: var(--gold); }
 .menu { position: relative; }
-.menu summary { list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; color: var(--on-brand); border: 1px solid var(--border); cursor: pointer; font-size: var(--t-2); }
+.menu summary { list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; color: var(--on-brand); border: 1px solid var(--brand-2); border-radius: 999px; cursor: pointer; font-size: var(--t-2); }
 .menu summary::-webkit-details-marker { display: none; }
-.menu[open] summary, .menu summary:hover { border-color: var(--ink); }
-.menu-panel { position: absolute; right: 0; top: calc(100% + 6px); z-index: 10; min-width: 200px; padding: 10px; color: var(--ink); background: var(--page); border: 1px solid var(--ink); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); display: flex; flex-direction: column; gap: 8px; }
+.menu[open] summary, .menu summary:hover { border-color: var(--gold); }
+.menu-panel { position: absolute; right: 0; top: calc(100% + 6px); z-index: 10; min-width: 200px; padding: 10px; color: var(--ink); background: var(--page); border: 1px solid var(--border); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); display: flex; flex-direction: column; gap: 8px; }
 .langs { display: flex; flex-direction: column; }
 .langs a { display: flex; align-items: center; min-height: 44px; padding: 0 8px; text-decoration: none; color: var(--ink); }
 .langs a:hover { background: var(--surface); }
@@ -174,12 +177,11 @@ header.top { background: var(--brand); color: var(--on-brand); padding: 0 24px; 
 /* tables */
 /* positioned, so a visually hidden header label inside stays inside: otherwise it escapes the scrolling box and
    widens the whole page on a phone */
-.table-wrap { position: relative; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 8px 0; }
-table { border-collapse: collapse; width: 100%; background: none; font-size: var(--t-2); }
-th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+.table-wrap { position: relative; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 8px 0; border: 1px solid var(--border); border-radius: 4px; }
+table { border-collapse: collapse; width: 100%; background: var(--surface); font-size: var(--t-2); }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--grid); text-align: left; vertical-align: top; }
 tbody tr:last-child td { border-bottom: 0; }
 th { font-weight: 600; color: var(--ink-2); font-size: var(--t-1); text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; }
-thead th { border-bottom: 2px solid var(--ink); vertical-align: bottom; }
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 tr.dim td { color: var(--ink-2); }
 tr.total td { font-weight: 600; }
@@ -314,7 +316,7 @@ select, input[type="search"] { font: inherit; font-size: var(--t-3); min-height:
 .next-strip { margin: 24px 0 0; }
 .next-strip .next-deadlines { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 24px; }
 .doors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 28px; }
-.door { display: flex; flex-direction: column; gap: 12px; padding: 24px; border: 2px solid var(--ink); border-radius: 10px; background: var(--page); }
+.door { display: flex; flex-direction: column; gap: 12px; padding: 24px; border: 2px solid var(--brand); border-radius: 10px; background: var(--page); }
 .door-first { background: var(--surface); }
 .door .kicker { margin: 0; color: var(--gold-ink); font-weight: 700; font-size: var(--t-3); }
 .door h2 { margin: 0; font-size: var(--t-6); line-height: 1.15; }
@@ -350,10 +352,10 @@ select, input[type="search"] { font: inherit; font-size: var(--t-3); min-height:
 .so-ink .so-kicker, .so-ink .so-cta { color: var(--sun); }
 .so-ink .so-body { color: var(--ink-card-2); }
 .so-ink strong { color: var(--page); }
-.so-brick { background: var(--brick); color: var(--ink); }
+.so-brick { background: var(--brick); color: #ffffff; }
 .so-brick .so-kicker, .so-brick .so-cta { color: var(--brick-accent); }
 .so-brick .so-body { color: var(--brick-ink); }
-.so-brick strong { color: var(--brick-accent); }
+.so-brick strong { color: #ffffff; }
 .so-sand { background: var(--sand); color: var(--ink); }
 .so-sand .so-kicker, .so-sand .so-cta { color: var(--sand-ink); }
 .so-teal { background: var(--teal); color: var(--ink); }
@@ -488,7 +490,7 @@ table.city-muns tr.subtotal th, table.city-muns tr.total th { text-align: left; 
 
 /* the municipality's page for a coordinator: my list, how it compares, the weak spots, my list by station */
 .mine { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; background: var(--surface); padding: 10px 14px; margin: 16px 0 0; font-size: var(--t-3); }
-.mine select { font: inherit; padding: 8px 10px; border: 1px solid var(--ink); background: var(--page); color: var(--ink); min-width: 240px; max-width: 100%; }
+.mine select { font: inherit; padding: 8px 10px; border: 1px solid var(--brand); background: var(--page); color: var(--ink); min-width: 240px; max-width: 100%; }
 .co-tiles { margin: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .co-tiles .tile { padding: 12px 14px; }
 .co-tiles .tile-value { font-family: var(--serif); font-size: var(--t-6); font-weight: 700; line-height: 1.1; }
@@ -574,8 +576,7 @@ table.villages td b { font-weight: 600; }
   h1 { font-size: var(--t-6); }
   h2 { font-size: var(--t-5); }
   .brand { font-size: var(--t-5); }
-  header.top { padding: 0 16px; }
-  .top-row.wrap { gap: 0 8px; }
+  .top-row { gap: 0 8px; }
   /* the six tabs wrap rather than scroll: a tab cut off at the screen's edge looked like none (20 Nov 2026) */
   .main-nav { order: 3; width: 100%; gap: 0 16px; flex-wrap: wrap; white-space: nowrap; }
   .main-nav a, .main-nav a[data-short]::after { font-size: var(--t-2); }

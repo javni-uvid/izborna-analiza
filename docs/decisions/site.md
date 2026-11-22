@@ -81,15 +81,16 @@ belongs to, in the same commit as the change. The principles and the rules of wo
 What the pages keep to (20 Nov 2026, taken at the maintainer's request from javni-uvid/zailiprotiv, whose rules
 came from looks at its site against WCAG 2.2, NN/g, GOV.UK, Stanford's credibility guidelines, the Trust Project
 and ProPublica's principles for news graphics), adapted to this site's readers (the curious visitor or
-controller, the coordinator, the statistician: 7–8 Nov 2026) and, since 20 Nov 2026, zailiprotiv's look. They are working
+controller, the coordinator, the statistician: 7–8 Nov 2026), with zailiprotiv's shapes and this site's own colours. They are working
 rules, changed as readers show otherwise, unlike the principles in AGENTS.md. A change to a page is checked
 against them.
 
 1. **One scale of letter sizes.** A size is a step of the scale (`--t-1` … `--t-8`, `--t-h1`, `--t-d1` in
    `site.css`, zailiprotiv's own); body text is 16 px; grey (`--ink-2`) is for what is secondary. A test
    (`tests/test_design.py`) refuses a size outside the scale; an SVG's labels in px are the exception.
-2. **A colour means a kind of content, never a list's merit.** Black ink on a white page, grey for what is
-   secondary and for the cards, the data in grey and black (bars, meters, the Explore map's scale); red only for
+2. **A colour means a kind of content, never a list's merit.** Navy ink on a white page (the palette of 8 Nov 2026,
+   back since 22 Nov 2026), navy-grey for what is secondary, navy-tinted cards, the data in navy (bars, meters, the
+   Explore map's scale), gold for the one thing to look at, a navy header with a gold rule; red only for
    warnings, each group of checks in its colour beside its name and symbol; a list's own colour only on the
    settlement maps (`data/list_colours.csv`, with a key that names it) and the seats (by size). White text only on
    colours dark in both themes. Text 4.5:1 or more against its background, a form control's edge 3:1, in both
@@ -413,3 +414,15 @@ against them.
   than the inline SVG, which twice on each of some 20,000 pages would have cost some 9 MB. Size: the test archive's
   site went from 48.2 to 51.7 MB (+7%; its 2,623 pages on the base template, ~1.3 KB each, most of it the footer
   block's text); the whole site, ~20,000 such pages, some +26 MB of 660, well within the budget.
+- **22 Nov 2026, the colours as they were before zailiprotiv's look (the maintainer's decision).** Asked whether
+  to bring back only the home page's colours or all of them, the maintainer chose "exactly as before #14": the
+  palette of 8 Nov 2026 is back on every page, in both themes. That means the navy header with the gold rule
+  across the window, the gold kickers and the big number, navy buttons and data, the navy-tinted first door and
+  cards, the red card on the home page, and tables on their tinted surface with their edge. The shared map
+  image's ink is navy again (`mapimg.js`). Kept from #14 and #22: the shapes (radius 10, uppercase table headers),
+  the skip link, the focus outline, reduced motion, the phone's wrapping tabs, the settlement map as a group,
+  Javni uvid's bar and footer block, and the family's fonts and scale of sizes from `osnova.css`. This site's
+  `--page`, `--surface`, `--ink`, `--ink-2` and `--border` are its own again, not the family's `--ju-*`. On
+  purpose this differs from `osnova/design/`, where the family shares its base colours. The bar keeps the
+  family's colours, so it is drawn the same on every site of the family. `tests/test_design.py` checks the navy
+  values and every contrast pair (all pass AA in both themes, as they did before #14).
