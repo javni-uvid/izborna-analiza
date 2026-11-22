@@ -15,6 +15,7 @@ from collections import Counter, defaultdict
 from datetime import datetime
 from importlib.metadata import version
 from pathlib import Path
+from xml.sax.saxutils import escape as xml_escape
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup
@@ -41,6 +42,7 @@ SERIES = 8  # categorical colour slots in site.css
 LOOKALIKE = str.maketrans("AaEeOoPpCcXxKkMHTBy", "АаЕеОоРрСсХхКкМНТВу")  # Latin letters RIK sometimes types for Cyrillic
 
 
+SITEMAP_PART = 40_000  # addresses in one sitemap file; the protocol allows 50,000 and 50 MB
 PART = "grad"  # a municipality's city settlement by its quarters lives at <municipality's address>/grad/
 
 
@@ -62,6 +64,7 @@ class Site:
         self.previous: dict[str, str] = {}
         self.state: dict[str, str] = {}
         self.produced: set[str] = set()
+        self.redirects: set[str] = set()  # pages that only lead elsewhere: left out of the sitemap
         self.kept = self.rendered = 0
         self.env = Environment(loader=FileSystemLoader(HERE / "templates"), autoescape=select_autoescape(),
                                trim_blocks=True, lstrip_blocks=True)
@@ -726,6 +729,7 @@ class Site:
 
     def redirect(self, loc: str, page: str, target: str) -> None:
         """A one-line page at an old address that leads to the new one (GitHub Pages has no server redirects)."""
+        self.redirects.add(PREFIX[loc] + page)
         if not self.keep(loc, page, "redirect|" + target):
             self.write(loc, page, "redirect.html", target=target)
 
@@ -1150,6 +1154,7 @@ class Site:
             name = self.mun_rows[rids[0]][code]["name"]
             self.put(f"feed/{code}.sr.xml", feed.build(self.archive.root, self.archive, "lat", self.site_url,
                                                        municipality=(code, name), entries=entries))
+        self.write_sitemap()
         self.finish()
         return self.out
 
@@ -1174,18 +1179,41 @@ class Site:
         errors = []
         for proc, receive in running:
             try:
-                produced, state, kept, rendered, error = receive.recv()
+                produced, redirects, state, kept, rendered, error = receive.recv()
             except EOFError:
-                produced, state, kept, rendered, error = set(), {}, 0, 0, "a process writing pages died"
+                produced, redirects, state, kept, rendered, error = set(), set(), {}, 0, 0, "a process writing pages died"
             proc.join()
             if error:
                 errors.append(error)
             self.produced |= produced
+            self.redirects |= redirects
             self.state.update(state)
             self.kept += kept
             self.rendered += rendered
         if errors:
             raise RuntimeError("\n".join(errors))
+
+    def write_sitemap(self) -> None:
+        """robots.txt and the sitemap for search engines: every page a build produced but the 404 page and the
+        redirects, by its address (a folder's index.html as the folder). Parts of SITEMAP_PART addresses under a
+        sitemap index, as the protocol allows at most 50,000 a file. No lastmod: the build doesn't know when a
+        page's content last changed, only when it was rendered. robots.txt blocks nobody: search engines and AI
+        crawlers, agents and assistants alike are welcome (the maintainer's decision, 22 Nov 2026)."""
+        base = self.site_url.rstrip("/") + "/"
+        pages = sorted(rel for rel in self.produced
+                       if rel.endswith(".html") and rel != "404.html" and rel not in self.redirects
+                       and not rel.startswith("static/"))
+        urls = [base + (rel[:-len("index.html")] if rel == "index.html" or rel.endswith("/index.html") else rel)
+                for rel in pages]
+        parts = [urls[i:i + SITEMAP_PART] for i in range(0, len(urls), SITEMAP_PART)] or [[]]
+        head = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        ns = 'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+        for n, part in enumerate(parts, 1):
+            body = "".join(f"<url><loc>{xml_escape(u)}</loc></url>\n" for u in part)
+            self.put(f"sitemap-{n}.xml", f"{head}<urlset {ns}>\n{body}</urlset>\n")
+        index = "".join(f"<sitemap><loc>{base}sitemap-{n}.xml</loc></sitemap>\n" for n in range(1, len(parts) + 1))
+        self.put("sitemap.xml", f"{head}<sitemapindex {ns}>\n{index}</sitemapindex>\n")
+        self.put("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {base}sitemap.xml\n")
 
     def finish(self) -> None:
         """Remove what no page produced any more (pages of places that no longer exist, old static files) and save
@@ -1439,13 +1467,13 @@ class Site:
 def _write_pages(site: Site, job, send) -> None:
     """In a forked process: run the job and send back what it wrote and recorded."""
     import traceback
-    site.produced, site.state, site.kept, site.rendered = set(), {}, 0, 0
+    site.produced, site.redirects, site.state, site.kept, site.rendered = set(), set(), {}, 0, 0
     error = ""
     try:
         job()
     except Exception:  # noqa: BLE001 - reported to the parent, which fails the build
         error = traceback.format_exc()
-    send.send((site.produced, site.state, site.kept, site.rendered, error))
+    send.send((site.produced, site.redirects, site.state, site.kept, site.rendered, error))
     send.close()
 
 

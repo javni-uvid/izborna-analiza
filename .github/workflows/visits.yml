@@ -1,5 +1,6 @@
 # By hand: what Cloudflare Web Analytics counted on the site (pages, where visitors came from, devices, hours),
-# and how fast the pages were for those who opened them (Core Web Vitals).
+# how fast the pages were for those who opened them (Core Web Vitals), and if asked, what Google Search showed of
+# the site and whether it indexed the pages.
 # Sums only, and no row seen fewer than three times: this log is public. Reads only.
 name: visits
 
@@ -9,6 +10,13 @@ on:
       hours:
         description: "How many hours back (1 to 2160)"
         default: "24"
+      search:
+        description: "Also Google Search: the searches the site came up for (needs the secret GSC_KEY)"
+        type: boolean
+        default: false
+      inspect:
+        description: "With search: whether Google indexed the pages, this many of each kind in each script (0: not asked; 8 is some 200 of the 2,000 a day)"
+        default: "0"
 
 permissions: {}
 
@@ -19,7 +27,7 @@ concurrency:
 jobs:
   read:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30  # URL Inspection takes some 5 s an address
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
@@ -27,6 +35,7 @@ jobs:
           sparse-checkout: |
             tools/visits.py
             tools/vitals.py
+            tools/search.py
           sparse-checkout-cone-mode: false
       - name: Read
         env:
@@ -52,3 +61,17 @@ jobs:
             echo "::notice::not read: the secrets CLOUDFLARE_ANALYTICS_TOKEN and CLOUDFLARE_ACCOUNT_ID are not set"; exit 0
           fi
           python3 tools/vitals.py "$HOURS"
+      - name: What Google Search showed
+        if: ${{ !cancelled() && inputs.search }}
+        env:
+          GSC_KEY: ${{ secrets.GSC_KEY }}
+          HOURS: ${{ inputs.hours }}
+          IN_INSPECT: ${{ inputs.inspect }}
+        run: |
+          case "$HOURS" in ''|*[!0-9]*) echo "::error::hours must be a number"; exit 1 ;; esac
+          case "$IN_INSPECT" in ''|*[!0-9]*) echo "::error::inspect must be a number"; exit 1 ;; esac
+          if [ -z "$GSC_KEY" ]; then echo "::notice::not read: the secret GSC_KEY is not set"; exit 0; fi
+          pip install -q google-auth==2.62.2 requests==2.34.2
+          # Search Console counts by day, and at least a week says something
+          days=$(( (HOURS + 23) / 24 < 7 ? 7 : (HOURS + 23) / 24 ))
+          python3 tools/search.py "$days" --inspect "$IN_INSPECT"
