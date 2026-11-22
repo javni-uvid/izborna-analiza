@@ -71,3 +71,34 @@ def test_fonts_are_served_from_the_site():
     for name in re.findall(r"url\(fonts/([^)]+)\)", fonts):
         assert (static / "fonts" / name).exists(), name
     assert (static / "fonts" / "OFL-Literata.txt").exists()
+
+
+BEACON = "https://static.cloudflareinsights.com/beacon.min.js"
+
+
+def test_analytics_script(monkeypatch, tmp_path):
+    """Cloudflare Web Analytics (22 Nov 2026, the maintainer's exception to principle 5): with a token every page
+    loads its script, the only one from another server, and the footer, the home page and the about page say that
+    visits are counted; without one there is no trace of it."""
+    from izbori import config
+    from izbori.history import Archive
+    from izbori.site import Site
+
+    def render(token: str) -> dict[str, str]:
+        monkeypatch.setattr(config, "ANALYTICS_TOKEN", token)
+        site = Site(Archive(tmp_path / "data"), tmp_path / token, None, "https://example.org/x/")
+        pages = {}
+        for loc in ("lat", "cyr"):
+            site.write(loc, "about.html", "about.html")
+            prefix = "" if loc == "lat" else "cyr/"
+            pages[loc] = (tmp_path / token / prefix / "about.html").read_text(encoding="utf-8")
+        return pages
+
+    for loc, page in render("").items():
+        assert "cloudflareinsights" not in page and "Cloudflare" not in page, loc
+        assert not re.search(r'<(script|link|img)[^>]+(src|href)="https?://', page), loc
+    for loc, page in render("abc123").items():
+        outside = re.findall(r'<(?:script|link|img)[^>]+(?:src|href)="(https?://[^"]+)"', page)
+        assert outside == [BEACON], loc
+        assert """data-cf-beacon='{"token": "abc123"}'""" in page, loc
+        assert page.count("Cloudflare Web Analytics") == 2, loc  # the footer and the principle

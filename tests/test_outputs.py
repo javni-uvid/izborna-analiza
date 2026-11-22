@@ -89,10 +89,11 @@ def test_site(site):
     # links to RIK documents are percent-encoded, so they survive transliteration
     hrefs = re.findall(r'href="(https://rik[^"]+)"', page)
     assert hrefs and all(not CYRILLIC.search(h) for h in hrefs)
-    # nothing loaded from other servers
+    # nothing loaded from other servers (Cloudflare's counting script only with a token, test_analytics_script)
     for path in out.rglob("*.html"):
         text = path.read_text(encoding="utf-8").replace("https://example.org/x/", "")  # the site's own address
         assert not re.search(r'<(script|link|img)[^>]+(src|href)="https?://', text), path
+        assert "cloudflareinsights" not in text, path
     assert "https://example.org/x/static/site.css" in (out / "404.html").read_text(encoding="utf-8")
 
 

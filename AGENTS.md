@@ -62,9 +62,11 @@ These are the project's promises to its readers. Never change them without the m
    - Anything parsed from a document that could hold a name is checked before it is kept. For example,
      `boards.clean_address` drops a member's line read where an address should be, and stores are scrubbed when
      they are read and written.
-5. **Nothing from third parties on the pages:** no analytics scripts, cookies, external fonts or scripts. Visitor
-   counts, if any, come from the host or the edge (for example Cloudflare's proxy analytics), not from a script on
-   the page.
+5. **Nothing from third parties on the pages:** no cookies, external fonts or scripts. The maintainer's exception:
+   - **visits counted** by Cloudflare Web Analytics (22 Nov 2026, as on javni-uvid/zailiprotiv; no cookies, totals
+     per page) when the build has its site token (`config.ANALYTICS_TOKEN`, from the repository's variable
+     `CLOUDFLARE_ANALYTICS_SITE_TOKEN`); the tests let this one script through; the footer, the home page and the
+     about page say so. The edge's own counts come from Cloudflare's proxy in front of the site.
 6. **The observer target list stays private.** It is never committed or built in GitHub Actions, because anyone
    with a GitHub account can download a public repository's build outputs.
 

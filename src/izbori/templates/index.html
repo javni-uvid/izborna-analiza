@@ -143,6 +143,6 @@
 <section class="trust-strip" aria-label="{{ t('trust_label') }}">
   <div><strong>{{ t('trust1_h') }}</strong><span>{{ t('trust1_b') }}</span></div>
   <div><strong>{{ t('trust2_h') }}</strong><span>{{ t('trust2_b') }}</span></div>
-  <div><strong>{{ t('trust3_h') }}</strong><span>{{ t('trust3_b') }} <button type="button" class="link-button" data-forget hidden>{{ t('forget_all') }}</button></span></div>
+  <div><strong>{{ t('trust3_h') }}</strong><span>{{ t('trust3_b_counted' if analytics else 'trust3_b') }} <button type="button" class="link-button" data-forget hidden>{{ t('forget_all') }}</button></span></div>
 </section>
 {% endblock %}

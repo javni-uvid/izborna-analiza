@@ -38,6 +38,10 @@ jobs:
           key: site-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: site-
       - name: Build
+        env:
+          # Cloudflare Web Analytics' site token, public by design (every page shows it): with it every page loads
+          # the counting script (principle 5's exception, 22 Nov 2026); without it, none
+          IZBORI_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_ANALYTICS_SITE_TOKEN }}
         run: |
           pip install uv==0.13.9 && uv sync --frozen
           uv run izbori site --out _site --incremental
@@ -70,3 +74,18 @@ jobs:
           # GitHub sometimes takes over 10 minutes "syncing files" (three deploys on 9 Nov 2026 timed out at the
           # default 10 minutes, while the deploys around them took under 3)
           timeout: 1800000
+      # The site stands behind Cloudflare's proxy (22 Nov 2026), which may keep its files: told after each publishing
+      # to forget them, so the new ones are served at once. Without the token or the zone's id: skipped. A failure
+      # is only a warning: the pages are published either way, and the cache forgets them by itself.
+      - name: Tell the cache the site changed
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ZONE: ${{ vars.CLOUDFLARE_ZONE_ID }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$ZONE" ]; then echo "::notice::cache not purged: no token or zone id"; exit 0; fi
+          for i in 1 2 3; do
+            got=$(curl -sS --max-time 30 -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE/purge_cache"               -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json"               --data '{"hosts":["izbornipodaci.rs","www.izbornipodaci.rs"]}' | head -c 300) || true
+            case "$got" in *'"success":true'*) echo "cache purged: izbornipodaci.rs"; exit 0;; esac
+            sleep 10
+          done
+          echo "::warning::cache not purged: $got"
