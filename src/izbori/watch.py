@@ -1,9 +1,9 @@
 """A weekly look at the municipalities' own web sites for the electoral commissions' documents.
 
 The law has local electoral commissions publish their acts on the web; most put them on the municipality's site,
-not in RIK's register. `data/municipal_sites.csv` lists each municipality's site (the domain of the commission's
-e-mail in RIK's address book of local commissions; a webmail address leaves the site to find by hand). `izbori
-watch` visits each site's front page, the pages linked from it that speak of elections or the commission, and the
+not in RIK's register. The family's list (`osnova/data/municipalities.csv`, kept in javni-uvid/osnova and copied
+here) gives each municipality's site: the domain of the commission's e-mail in RIK's address book of local
+commissions, corrected there when it doesn't answer (osnova's weekly **sites** workflow). `izbori watch` visits each site's front page, the pages linked from it that speak of elections or the commission, and the
 site's own search for polling stations and polling boards (most are WordPress), and keeps the links to documents
 (.pdf, .doc, .docx) whose link text or file name is about polling stations, polling boards or the commission —
 in `data/municipal_docs.json`: link, municipality, kind, when first seen. No text of a document is kept, and
@@ -25,7 +25,12 @@ from pathlib import Path
 from izbori import jsonfile
 from izbori.translit import latin
 
-SITES_FILE = "municipal_sites.csv"
+# the family's list of municipalities and their sites (javni-uvid/osnova, shared/data/), as copied into osnova/:
+# read here, never written; a site found or corrected goes there (22 Nov 2026)
+SITES = Path(__file__).resolve().parents[2] / "osnova" / "data" / "municipalities.csv"
+# this project's own: the pages where a commission keeps its documents, when its site's front page doesn't lead
+# there (data/commission_pages.csv: municipality_code, pages)
+PAGES_FILE = "commission_pages.csv"
 STORE = "municipal_docs.json"
 # a browser-like start, as some municipal sites refuse a bare client name (403), and who we are after it
 AGENT = "Mozilla/5.0 (compatible; izborna-analiza; +https://izbornipodaci.rs)"
@@ -69,11 +74,22 @@ def kind_of(text: str) -> str | None:
     return None
 
 
-def load_sites(path: Path) -> list[dict]:
+def _rows(path: Path) -> list[dict]:
     if not Path(path).exists():
         return []
     with open(path, encoding="utf-8", newline="") as f:
         return [{k: (v or "").strip() for k, v in row.items() if k} for row in csv.DictReader(f)]
+
+
+def load_sites(root: Path | None = None) -> list[dict]:
+    """The family's list, each row with its commission's own pages from root's PAGES_FILE ("pages")."""
+    pages = {r["municipality_code"]: r.get("pages", "") for r in _rows(Path(root) / PAGES_FILE)} if root else {}
+    return [{**s, "pages": pages.get(s["municipality_code"], "")} for s in _rows(SITES)]
+
+
+def names() -> dict[str, str]:
+    """Each municipality's name by its code, as RIK writes it (Cyrillic)."""
+    return {s["municipality_code"]: s["name"] for s in _rows(SITES)}
 
 
 class Links(HTMLParser):
@@ -157,7 +173,7 @@ def same_site(netloc: str, host: str) -> bool:
 def crawl(domain: str, log=None, fetcher=fetch, sleep=time.sleep, pages_of: tuple = ()) -> dict[str, str]:
     """The commission's documents on one site: url → kind. The front page, then the pages it links to about
     elections or the commission (one level), then the site's search for each phrase in SEARCHES. pages_of: the
-    pages where the commission keeps its documents (municipal_sites.csv's "pages"), when the front page doesn't lead
+    pages where the commission keeps its documents (data/commission_pages.csv), when the front page doesn't lead
     there, read first."""
     host = domain.lower()
     # the front page: https, then www, then plain http (old sites)
@@ -262,61 +278,15 @@ def save_store(root: Path, store: dict) -> None:
     (Path(root) / STORE).write_text(jsonfile.dumps(store, "docs"), encoding="utf-8")
 
 
-def variants(domain: str) -> list[str]:
-    """Other spellings of a municipality's site, for when the commission's e-mail domain doesn't answer: Valjevo's
-    mail is at valjevo.org.rs, its site at valjevo.rs. The same name under .rs, .org.rs and .ls.gov.rs."""
-    d = domain.lower().removeprefix("www.")
-    for tail in (".ls.gov.rs", ".org.rs", ".gov.rs", ".rs"):
-        if d.endswith(tail):
-            base = d[: -len(tail)]
-            break
-    else:
-        return []
-    if "." in base:  # grad.zrenjanin.rs, obrenovac.bg.ls.gov.rs: a name inside another; left as it is
-        return []
-    return [f"{base}{t}" for t in (".rs", ".org.rs", ".ls.gov.rs", ".gov.rs") if f"{base}{t}" != d]
-
-
-def answers(domain: str, fetcher=fetch) -> bool:
-    for r in (f"https://{domain}/", f"https://www.{domain}/", f"http://{domain}/", f"http://www.{domain}/"):
-        try:
-            fetcher(r)
-            return True
-        except Exception:  # noqa: BLE001 - the next spelling
-            continue
-    return False
-
-
-def save_sites(path: Path, sites: list[dict]) -> None:
-    cols = list(sites[0].keys()) if sites else ["municipality_code", "name", "domain", "note"]
-    with open(path, "w", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=cols, lineterminator="\n")
-        w.writeheader()
-        w.writerows(sites)
-
-
-def run(root: Path, today: str, log=print, fetcher=fetch, sleep=time.sleep, only: set | None = None,
-        others_only: bool = False) -> int:
-    """Visit every site with a domain; keep new documents; return how many are new. A site whose domain doesn't
-    answer is looked for under its other spellings (`variants`); one that answers replaces it in
-    municipal_sites.csv, the old one named in the note. others_only: skip the domain itself (just tried by another
-    run) and look only under the other spellings."""
-    all_sites = load_sites(Path(root) / SITES_FILE)
-    sites = [s for s in all_sites if s.get("domain")]
+def run(root: Path, today: str, log=print, fetcher=fetch, sleep=time.sleep, only: set | None = None) -> int:
+    """Visit every site with a domain; keep new documents; return how many are new. A site that doesn't answer is
+    logged (`crawl`); looking for it under another spelling is osnova's sites workflow's, which corrects the list."""
+    sites = [s for s in load_sites(root) if s.get("domain")]
     if only:
         sites = [s for s in sites if s["municipality_code"] in only]
     store = load_store(root)
-    new, moved = 0, False
+    new = 0
     for s in sites:
-        if others_only or not answers(s["domain"], fetcher):
-            alt = next((v for v in variants(s["domain"]) if answers(v, fetcher)), None)
-            if alt:
-                log(f"{s['municipality_code']} {latin(s['name'])}: {s['domain']} doesn't answer, {alt} does")
-                s["note"] = (s.get("note", "") + f"; was {s['domain']}, found by the watch {today}").strip("; ")
-                s["domain"], moved = alt, True
-            elif others_only:
-                log(f"{s['municipality_code']} {latin(s['name'])}: no other spelling of {s['domain']} answers")
-                continue
         try:
             found = crawl(s["domain"], log, fetcher, sleep, tuple((s.get("pages") or "").split()))
         except Exception as e:  # noqa: BLE001 - one site's oddity must not lose the others' finds
@@ -334,7 +304,5 @@ def run(root: Path, today: str, log=print, fetcher=fetch, sleep=time.sleep, only
                 if k == "stations":
                     log(f"  candidate for station_lists.csv: <round>,{s['municipality_code']},{u},\"found on the site\"")
     save_store(root, store)
-    if moved:
-        save_sites(Path(root) / SITES_FILE, all_sites)
     log(f"{len(sites)} sites visited, {new} new documents, {len(store['docs'])} kept")
     return new

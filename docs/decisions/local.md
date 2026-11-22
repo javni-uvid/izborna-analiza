@@ -283,3 +283,9 @@ in AGENTS.md.
   Lazarevac, Čukarica, Stari grad, Palilula 2024 and others — and 40 more have 5 to 14. The count misses known
   tables: Vlasotince's and Zemun's (1 and 2 rows: their scans are hard to read), Rača's (a section per station), so
   it is a floor, not a sorting; which of the rest are by station needs each first page seen.
+- **22 Nov 2026, the list of the municipalities' sites is the family's.** The maintainer's decision: the list is
+  kept in javni-uvid/osnova (`shared/data/municipalities.csv`, here `osnova/data/municipalities.csv`), since
+  ucestvuj and nabavke need it too, and the search for a domain that doesn't answer moved there with it (osnova's
+  weekly **sites** workflow, Monday, before the watch). `data/municipal_sites.csv` is gone: its rows are osnova's
+  as of today, its `pages` column (Novi Sad's commission page only) is `data/commission_pages.csv`. The watch
+  reads the list and never writes it, and `--others-only` is gone with the search. The code stays the key.

@@ -3,6 +3,14 @@ document's text or title is kept."""
 from izbori import watch
 
 
+def family_list(monkeypatch, tmp_path, text, encoding="utf-8"):
+    """The family's list of municipalities (osnova/data/municipalities.csv) for a test."""
+    path = tmp_path / "municipalities.csv"
+    path.write_text(text, encoding=encoding)
+    monkeypatch.setattr(watch, "SITES", path)
+
+
+
 def test_kind_of_links():
     assert watch.kind_of("Одлука о одређивању бирачких места за изборе 25.10.2026 odluka.pdf") == "stations"
     assert watch.kind_of("Rešenje o utvrđivanju biračkih mesta") == "stations"
@@ -15,7 +23,7 @@ def test_kind_of_links():
     assert watch.kind_of("Резултати такмичења") is None
 
 
-def test_crawl_follows_election_pages_and_keeps_documents(tmp_path):
+def test_crawl_follows_election_pages_and_keeps_documents(tmp_path, monkeypatch):
     pages = {
         "https://primer.rs/": '<a href="/izbori-2026/">Избори 2026</a> <a href="/vesti/">Вести</a> '
                               '<a href="https://drugi.rs/odluka-biracka-mesta.pdf">Одлука о одређивању бирачких места</a>',
@@ -37,7 +45,7 @@ def test_crawl_follows_election_pages_and_keeps_documents(tmp_path):
                      "https://primer.rs/files/resenje-bo-bm-12.pdf": "boards",
                      "https://primer.rs/files/odluka-bm-2023.docx": "stations"}  # another site's file and the news page are not followed
     assert "https://primer.rs/vesti/" not in asked and "https://primer.rs/izbori-2026/" in asked
-    (tmp_path / "municipal_sites.csv").write_text("municipality_code,name,domain,note\n70017,Пример,primer.rs,\n70025,Други,,webmail\n",
+    family_list(monkeypatch, tmp_path, "municipality_code,name,domain,note\n70017,Пример,primer.rs,\n70025,Други,,webmail\n",
                                                  encoding="utf-8")
     logged = []
     assert watch.run(tmp_path, "2026-11-08", logged.append, fetcher, lambda s: None) == 3
@@ -83,42 +91,9 @@ def test_why_says_what_failed():
     assert watch.why(urllib.error.HTTPError("u", 403, "Forbidden", {}, None)).startswith("HTTPError Forbidden")
 
 
-def test_other_spellings_of_a_site(tmp_path):
-    assert watch.variants("valjevo.org.rs") == ["valjevo.rs", "valjevo.ls.gov.rs", "valjevo.gov.rs"]
-    assert watch.variants("bojnik.ls.gov.rs")[0] == "bojnik.rs"
-    assert watch.variants("grad.zrenjanin.rs") == []
-    (tmp_path / "municipal_sites.csv").write_text(
-        "municipality_code,name,domain,note\n70360,Ваљево,valjevo.org.rs,rik-adresar\n", encoding="utf-8")
-
-    def fetcher(url):
-        if "valjevo.rs" not in url:
-            raise OSError("down")
-        return '<a href="/izbori/odluka-o-odredjivanju-birackih-mesta.pdf">Одлука о одређивању бирачких места</a>'
-    logged = []
-    assert watch.run(tmp_path, "2026-11-09", logged.append, fetcher, lambda s: None) == 1
-    sites = watch.load_sites(tmp_path / "municipal_sites.csv")
-    assert sites[0]["domain"] == "valjevo.rs" and "was valjevo.org.rs" in sites[0]["note"]
-    assert any("valjevo.org.rs doesn't answer, valjevo.rs does" in m for m in logged)
-
-
-def test_others_only_skips_the_domain_itself(tmp_path):
-    (tmp_path / "municipal_sites.csv").write_text(
-        "municipality_code,name,domain,note\n70360,Ваљево,valjevo.org.rs,\n70017,Пример,primer.rs,\n", encoding="utf-8")
-    asked = []
-
-    def fetcher(url):
-        asked.append(url)
-        raise OSError("down")
-    logged = []
-    watch.run(tmp_path, "2026-11-09", logged.append, fetcher, lambda s: None, only={"70360"}, others_only=True)
-    assert not any("valjevo.org.rs" in u for u in asked) and any("valjevo.rs" in u for u in asked)
-    assert not any("primer" in u for u in asked)
-    assert any("no other spelling of valjevo.org.rs answers" in m for m in logged)
-
-
-def test_a_broken_link_or_a_crash_does_not_stop_the_run(tmp_path):
+def test_a_broken_link_or_a_crash_does_not_stop_the_run(tmp_path, monkeypatch):
     assert watch.links_of('<a href="http://[broken/x.pdf">x</a><a href="/a.pdf">a</a>', "https://p.rs/") == [("https://p.rs/a.pdf", "a")]
-    (tmp_path / "municipal_sites.csv").write_text(
+    family_list(monkeypatch, tmp_path, 
         "municipality_code,name,domain,note\n70017,Први,prvi.rs,\n70025,Други,drugi.rs,\n", encoding="utf-8")
 
     def fetcher(url):
@@ -147,3 +122,21 @@ def test_a_document_on_the_site_s_file_host():
                                'бирачким местима</a><a href="https://media.readycms.io/x/strana/">Страна</a>'}
     found = watch.crawl("ub.rs", fetcher=lambda u: pages.get(u, ""), sleep=lambda s: None)
     assert found == {"https://media.readycms.io/x/Odluka%20o%20birackim%20mestima.pdf": "stations"}  # its pages not followed
+
+
+def test_the_family_list_and_the_commission_pages(tmp_path, monkeypatch):
+    family_list(monkeypatch, tmp_path, "municipality_code,name,domain,note\n89010,Град Нови Сад,novisad.rs,\n"
+                                       "70017,Пример,primer.rs,\n")
+    (tmp_path / watch.PAGES_FILE).write_text("municipality_code,pages\n89010,https://skupstina.novisad.rs/gik-strana/\n",
+                                             encoding="utf-8")
+    sites = watch.load_sites(tmp_path)
+    assert sites[0]["pages"] == "https://skupstina.novisad.rs/gik-strana/" and sites[1]["pages"] == ""
+    assert watch.names() == {"89010": "Град Нови Сад", "70017": "Пример"}
+
+
+def test_the_commission_pages_name_municipalities_of_the_family_list():
+    from pathlib import Path
+    data = Path(__file__).resolve().parents[1] / "data"
+    codes = set(watch.names())
+    assert len(codes) > 160  # osnova/data/municipalities.csv, the copy of javni-uvid/osnova's list
+    assert {s["municipality_code"] for s in watch._rows(data / watch.PAGES_FILE)} <= codes

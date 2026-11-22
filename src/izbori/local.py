@@ -1238,11 +1238,9 @@ def overview(root, log=print, fetch=None, read=True) -> list[dict]:
     """Per municipality and local election: its documents by kind and what its results are in: a report by station
     ("stations", with how many rows were read), the commission's totals only ("totals"), or the boards' minutes only
     ("minutes"). With read, each report ("izveštaj" in its link) is downloaded and read."""
-    import csv
     from collections import Counter
     from pathlib import Path
-    names = {r["municipality_code"]: r["name"] for r in csv.DictReader(open(Path(root) / watch.SITES_FILE,
-                                                                             encoding="utf-8"))}
+    names = watch.names()
     store = load_store(root)
     by_code: dict[str, dict] = {}
     for u, v in store["docs"].items():

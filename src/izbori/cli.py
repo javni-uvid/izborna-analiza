@@ -4,7 +4,6 @@ settlements | site | targets | check."""
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import re
 import subprocess
@@ -748,8 +747,7 @@ def cmd_local(args) -> int:
                            if local.report_candidates(store, c, args.date)
                            and not (root / "rounds" / local.round_id(c, args.date)).exists())
             log(f"{args.date}: {len(codes)} municipalities with a report: {', '.join(codes)}")
-        names_of = {r["municipality_code"]: r["name"] for r in csv.DictReader(
-            open(root / watch.SITES_FILE, encoding="utf-8"))}
+        names_of = watch.names()
         made, outcome = [], []
         for code in codes:  # several municipalities of the same election day in one run, one failing not the rest
             name = args.name if args.name and len(codes) == 1 else names_of.get(code, code)
@@ -862,9 +860,8 @@ def cmd_watch(args) -> int:
     """Look at the municipalities' sites for the electoral commissions' documents (data/municipal_docs.json)."""
     from izbori import watch
     root = Path(args.data)
-    new = watch.run(root, now_iso()[:10], log, only=set(args.only.split(",")) if args.only else None,
-                    others_only=args.others_only)
-    if args.commit and commit([str(root / watch.STORE), str(root / watch.SITES_FILE)],
+    new = watch.run(root, now_iso()[:10], log, only=set(args.only.split(",")) if args.only else None)
+    if args.commit and commit([str(root / watch.STORE)],
                               f"Data: {new} documents found on the municipalities' sites"):
         if args.push:
             push()
@@ -1263,7 +1260,6 @@ def main(argv: list[str] | None = None) -> int:
     w.add_argument("--only", metavar="CODES", help="only these municipalities (codes, comma-separated)")
     w.add_argument("--commit", action="store_true")
     w.add_argument("--push", action="store_true")
-    w.add_argument("--others-only", action="store_true", help="skip the domains themselves, try only their other spellings")
     w.set_defaults(fn=cmd_watch)
 
     sl = sub.add_parser("stationlist", help="read the commissions' decisions on polling stations listed in "
