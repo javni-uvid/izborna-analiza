@@ -57,7 +57,10 @@ belongs to, in the same commit as the change. The principles and the rules of wo
   lives in code: feeds, the 404 page, the mail and the map image's source line all take it from there.
   - The purge asks for the whole zone (22 Nov 2026): the first run's purge by hosts was refused ("Request must
     contain one of purge_everything, files, tags, hosts or prefixes", code 1012) while the zone was still
-    pending, and the zone holds only this site, so forgetting all of it costs nothing more.
+    pending, and the zone holds only this site, so forgetting all of it costs nothing more. The same refusal came
+    with `purge_everything` too: the body never reached Cloudflare, most likely because the token was pasted
+    into the secret with a line break that ended curl's headers early. The step now strips spaces and breaks
+    from the token and the zone's id first.
   - Cloudflare Pages' free plan doesn't fit, with its limit of 20,000 files. Workers' paid plan (100,000 files) or
     a VPS are the fallback if the site outgrows 1 GB.
   - AI crawlers, agents and assistants are allowed (22 Nov 2026, the maintainer's decision; unlike zailiprotiv,

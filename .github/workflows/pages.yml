@@ -82,6 +82,9 @@ jobs:
           TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           ZONE: ${{ vars.CLOUDFLARE_ZONE_ID }}
         run: |
+          # A value pasted with a line break at its end ends curl's headers early and the body goes missing (code
+          # 1012, "Request must contain one of purge_everything…"): the spaces and breaks around them go.
+          TOKEN=$(printf '%s' "$TOKEN" | tr -d '[:space:]'); ZONE=$(printf '%s' "$ZONE" | tr -d '[:space:]')
           if [ -z "$TOKEN" ] || [ -z "$ZONE" ]; then echo "::notice::cache not purged: no token or zone id"; exit 0; fi
           for i in 1 2 3; do
             got=$(curl -sS --max-time 30 -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE/purge_cache" \
