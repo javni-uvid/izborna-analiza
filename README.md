@@ -309,6 +309,8 @@ Every page says which RIK timestamp the data comes from and when it was fetched.
 
 **Search engines.** Each build writes `robots.txt`, which lets every crawler in (search engines and AI crawlers, agents and assistants alike) and names the sitemap, and `sitemap.xml`, an index of `sitemap-N.xml` parts listing every page but the 404 page and the redirects. The sitemap is submitted in Google Search Console by hand.
 
+**The mark.** A ballot box with a gold slip going in, left of the name in every page's header (drawn by the stylesheet from `static/brand-mark.svg`, white on the navy header, the theme's gold). The build copies `src/izbori/root/` to the site's root: `favicon.svg` (its own colours in a dark scheme), `favicon.ico`, `favicon-96.png` (search results show no SVG), `apple-touch-icon.png`, `logo.png` (named as the publisher's logo in the home page's schema.org data, WebSite and Organization) and `og-image.png` (the picture a shared link shows). `tools/icons.py` draws them all from the one mark.
+
 ## Alerts
 
 - **Atom feeds** (`feed.sr.xml`, `feed.en.xml`): one entry per fetch that adds flags.
@@ -444,7 +446,7 @@ src/izbori/
   mail.py       email digest
   i18n.py       text, numbers and dates in three locales
   translit.py   Cyrillic → Latin
-  site.py       static site builder, with templates/ and static/
+  site.py       static site builder, with templates/, static/ and root/ (the mark's files at the site's root)
 data/           the archive
 notes/          news notes per round, added by hand
 docs/decisions/ the decisions behind each part, for those who change it (AGENTS.md has the map)

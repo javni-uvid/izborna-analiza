@@ -6,7 +6,12 @@
 <title>{% block title %}{{ t('site_name') }}{% endblock %} · {{ t('site_name') }}</title>
 <meta name="description" content="{{ t('tagline') }}">
 <meta name="referrer" content="no-referrer">
-<link rel="stylesheet" href="{{ root }}static/osnova.css">
+{# the mark (tools/icons.py); browsers ask for /favicon.ico by themselves #}<link rel="icon" type="image/svg+xml" href="{{ root }}favicon.svg">
+<link rel="icon" type="image/png" sizes="96x96" href="{{ root }}favicon-96.png">
+<link rel="apple-touch-icon" href="{{ root }}apple-touch-icon.png">
+<meta property="og:image" content="{{ site_url }}og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+{% if page == 'index.html' %}<script type="application/ld+json">{{ ld({"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": site_url ~ "#site", "name": t('site_name'), "url": site_url, "inLanguage": lang, "publisher": {"@id": site_url ~ "#org"}}, {"@type": "Organization", "@id": site_url ~ "#org", "name": t('site_name'), "url": site_url, "logo": site_url ~ "logo.png", "parentOrganization": {"@type": "Organization", "name": "Јавни увид", "url": "https://javni-uvid.github.io/osnova/"}}]}) }}</script>
+{% endif %}<link rel="stylesheet" href="{{ root }}static/osnova.css">
 <link rel="stylesheet" href="{{ root }}static/site.css">
 <link rel="stylesheet" href="{{ root }}static/labels.css">
 <script>try { var th = localStorage.getItem('theme'); if (th === 'dark' || th === 'light') document.documentElement.dataset.theme = th; } catch (e) {}</script>
@@ -19,7 +24,7 @@
 {{ family_bar(loc, link('index.html'))|safe }}
 <header class="top">
   <div class="wrap top-row">
-    <a class="brand" href="{{ link('index.html') }}">{{ t('site_name') }}</a>
+    <a class="brand" href="{{ link('index.html') }}"><span class="brand-mark" aria-hidden="true"></span>{{ t('site_name') }}</a>
     <nav class="main-nav" aria-label="{{ t('nav_main') }}">
       <a href="{{ link('index.html') }}"{% if page == 'index.html' %} aria-current="page"{% endif %}>{{ t('nav_home') }}</a>
       <a href="{{ link('elections.html') }}"{% if page == 'elections.html' or (page.startswith('r/') and '/m/' not in page) %} aria-current="page"{% endif %}>{{ t('nav_elections') }}</a>
