@@ -55,6 +55,9 @@ belongs to, in the same commit as the change. The principles and the rules of wo
   `CLOUDFLARE_ZONE_ID`); a failure there is only a warning. The custom domain is set in the repository's Pages
   settings (an Actions deployment needs no CNAME file). `SITE_URL` in config.py is the only place the address
   lives in code: feeds, the 404 page, the mail and the map image's source line all take it from there.
+  - The purge asks for the whole zone (22 Nov 2026): the first run's purge by hosts was refused ("Request must
+    contain one of purge_everything, files, tags, hosts or prefixes", code 1012) while the zone was still
+    pending, and the zone holds only this site, so forgetting all of it costs nothing more.
   - Cloudflare Pages' free plan doesn't fit, with its limit of 20,000 files. Workers' paid plan (100,000 files) or
     a VPS are the fallback if the site outgrows 1 GB.
 
