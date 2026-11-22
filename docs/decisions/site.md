@@ -63,6 +63,15 @@ belongs to, in the same commit as the change. The principles and the rules of wo
   - AI crawlers, agents and assistants are allowed (22 Nov 2026, the maintainer's decision; unlike zailiprotiv,
     which blocks training crawlers): Cloudflare's AI Crawl Control lets all through and the managed robots.txt adds
     nothing.
+  - **Search engines** (22 Nov 2026): the site writes its own `robots.txt` (everyone allowed, the sitemap named) and
+    `sitemap.xml`, an index of parts of at most 40,000 addresses (the protocol allows 50,000) listing every page but
+    the 404 page and the redirects, a folder's `index.html` as the folder, without `lastmod` (the build knows when it
+    rendered a page, not when what it shows changed). Search Console's Domain property `izbornipodaci.rs` is the
+    maintainer's (verified by a TXT record at Cloudflare); the sitemap is submitted there by hand, since the service
+    account **visits** uses is "Restricted" and can't submit. `tools/search.py` (**visits**, `search`; from
+    zailiprotiv's) reads Search Console with that account's key in `GSC_KEY`: searches, pages, and the pages summed by
+    the kinds of `tools/vitals.py`, without rows seen fewer than three times; `inspect N` asks the URL Inspection API
+    about N addresses of each kind in each script, spread over the sitemap.
 
 ## Design rules
 

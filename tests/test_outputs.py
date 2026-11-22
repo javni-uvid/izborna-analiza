@@ -715,3 +715,35 @@ def test_register_report_shape_names_nothing():
     assert cli.report_shape(b"<html>") == "not a PDF (6 bytes)"
     assert cli.TOTAL_REPORT.search("ukupan izvestaj o rezultatima")
     assert not cli.TOTAL_REPORT.search("izvestaj o sprovedenim izborima")
+
+
+def test_sitemap_and_robots(site):
+    """robots.txt blocks nobody and names the sitemap; the sitemap lists every page there is, and only pages: no
+    redirect, no 404 page, nothing but HTML (22 Nov 2026)."""
+    out = site
+    assert (out / "robots.txt").read_text(encoding="utf-8") == (
+        "User-agent: *\nAllow: /\n\nSitemap: https://example.org/x/sitemap.xml\n")
+    ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    index = ET.parse(out / "sitemap.xml").getroot()
+    assert index.tag == "{%s}sitemapindex" % ns["s"]
+    urls = []
+    for loc in index.findall("s:sitemap/s:loc", ns):
+        assert loc.text.startswith("https://example.org/x/sitemap-")
+        part = ET.parse(out / loc.text.removeprefix("https://example.org/x/")).getroot()
+        found = [u.text for u in part.findall("s:url/s:loc", ns)]
+        assert 0 < len(found) <= 50_000 and not part.findall("s:url/s:lastmod", ns)
+        urls += found
+    assert len(urls) == len(set(urls))
+    assert "https://example.org/x/" in urls and "https://example.org/x/cyr/" in urls
+    for url in urls:
+        rel = url.removeprefix("https://example.org/x/")
+        path = out / (rel + "index.html" if rel == "" or rel.endswith("/") else rel)
+        assert path.suffix == ".html" and path.is_file(), url
+        assert path.name != "404.html" and 'http-equiv="refresh"' not in path.read_text(encoding="utf-8"), url
+    # every page that isn't a redirect or the 404 page is in it
+    pages = {p.relative_to(out).as_posix() for p in out.rglob("*.html") if not p.is_relative_to(out / "static")}
+    redirects = {r for r in pages if 'http-equiv="refresh"' in (out / r).read_text(encoding="utf-8")}
+    listed = {u.removeprefix("https://example.org/x/") for u in urls}
+    listed = {r + "index.html" if r == "" or r.endswith("/") else r for r in listed}
+    assert listed == pages - redirects - {"404.html"}
+    assert redirects, "the fixture's site has redirects, so leaving them out is tested"
