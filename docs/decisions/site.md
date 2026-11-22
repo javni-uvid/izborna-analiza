@@ -398,3 +398,18 @@ against them.
   opened often enough to say; for a kind under the line (good for fewer than 75% of loads) the elements Cloudflare
   names. Sums only, no row measured fewer than 20 times; the two readings run as separate steps, so one failing
   doesn't stop the other.
+- **22 Nov 2026, Javni uvid's bar and footer block, as zailiprotiv's (the maintainer's request).** Every page begins,
+  right after the skip link, with the family's bar (Javni uvid, leading to its page, then its sites, this one
+  marked `aria-current` and leading home) and its footer ends with the family's block (the promise, the principles,
+  a line on each site), written by `family.py` from `osnova/design/sites.json` in the page's own script, so a
+  Cyrillic page links the other sites' Cyrillic editions (pages are rendered once per script, no `data-cir-href`
+  needed). The font, the page's base colours in both themes and the scale of sizes come from the family's
+  `osnova.css`, copied into `static/` with its fonts by the build and loaded before `site.css`, whose `--page`,
+  `--surface`, `--ink`, `--ink-2`, `--border`, `--serif`, `--sans` and `--t-*` are now the `--ju-*` values; they
+  were the same values already (20 Nov 2026), so nothing but the bar and the block changed on a page.
+  `static/fonts.css` and the site's own copy of the fonts went (osnova's are the same files). `osnova/design/` is
+  part of the code's version, so a new site of the family rebuilds every page. One difference from `family.html`:
+  the family's mark is a `<span>` that `site.css` draws (a square's outline and a dot in the text's colour) rather
+  than the inline SVG, which twice on each of some 20,000 pages would have cost some 9 MB. Size: the test archive's
+  site went from 48.2 to 51.7 MB (+7%; its 2,623 pages on the base template, ~1.3 KB each, most of it the footer
+  block's text); the whole site, ~20,000 such pages, some +26 MB of 660, well within the budget.
