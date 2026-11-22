@@ -20,7 +20,7 @@ from xml.sax.saxutils import escape as xml_escape
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup
 
-from izbori import boards, config, feed, maps, quarters, repeat, stats, svg
+from izbori import boards, config, family, feed, maps, quarters, repeat, stats, svg
 from izbori.checks import BY_CODE, CHECKS, GROUPS, RULES
 from izbori.config import REPO_URL, RIK_PUBLIC, SITE_URL
 from izbori.contests import Presidential, Proportional, contest_rules
@@ -103,6 +103,7 @@ class Site:
             "kind_name": lambda k: kind_name(k, loc),
             "check_name": lambda c: check_name(c, loc), "check_rule": lambda c: check_rule(c, loc, RULES),
             "analytics": config.ANALYTICS_TOKEN,
+            "family_bar": family.bar, "family_foot": family.foot,  # Javni uvid's bar and footer block (family.py)
             "repo_url": REPO_URL, "rik_url": RIK_PUBLIC, "feed_href": root + ("feed.en.xml" if loc == "en"
                                                                               else "feed.sr.xml"),
             **extra,
@@ -995,6 +996,13 @@ class Site:
             shutil.rmtree(self.out)
         (self.out / "static").mkdir(parents=True, exist_ok=True)
         shutil.copytree(HERE / "static", self.out / "static", dirs_exist_ok=True)
+        # the family's stylesheet and fonts, from the copy of javni-uvid/osnova (family.py)
+        for f in family.files():
+            if f.suffix != ".json":
+                rel = "static/" + ("fonts/" if f.parent.name == "fonts" else "") + f.name
+                (self.out / rel).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(f, self.out / rel)
+                self.produced.add(rel)
         # pages are recorded by their POSIX path, on Windows too (20 Nov 2026: finish() took r\680072\index.html
         # for a page no build produced, and removed every page in a folder)
         self.produced.update(f.relative_to(self.out).as_posix() for f in (self.out / "static").rglob("*")
@@ -1657,6 +1665,9 @@ def code_version() -> str:
     for package in ("jinja2", "markupsafe"):
         h.update(f"{package}={version(package)}".encode())
     h.update(platform.python_version().encode())
+    for f in family.files():  # the family's bar, footer block and stylesheet, from osnova/design
+        h.update(f.name.encode())
+        h.update(f.read_bytes())
     h.update(config.ANALYTICS_TOKEN.encode())  # set or changed: every page's script tag changes
     return h.hexdigest()[:16]
 

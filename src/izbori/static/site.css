@@ -5,14 +5,15 @@
    meters, trend lines), the lists' own colours only on the settlement maps and the seats, by size. */
 :root {
   color-scheme: light;
-  --page: #ffffff;
-  --surface: #f3f3f1;
-  --ink: #111111;
-  --ink-2: #555555;
+  /* the page's base colours, fonts and sizes are the family's (osnova.css, loaded first: 22 Nov 2026) */
+  --page: var(--ju-bg);
+  --surface: var(--ju-card);
+  --ink: var(--ju-fg);
+  --ink-2: var(--ju-muted);
   --grid: #e6e6e3;
   --axis: #b8b8b4;
   --mp-none: #e6e3de;
-  --border: #d9d9d9;
+  --border: var(--ju-line);
   --link: #111111;
   --link-hover: #555555;
   /* the header and the buttons: white and black, as zailiprotiv's */
@@ -34,15 +35,16 @@
   /* The one scale of letter sizes (20 Nov 2026, as zailiprotiv's): every font-size in this file is one of these
      (a test checks it). 12.8, 14, 16, 18, 20, 24, 30, 36 px; then a page's title, and a headline or big number.
      The exceptions: an SVG's labels in px, sizes relative to the parent (em, inherit), and 0 for the short nav names. */
-  --t-1: .8rem; --t-2: .875rem; --t-3: 1rem; --t-4: 1.125rem; --t-5: 1.25rem; --t-6: 1.5rem; --t-7: 1.875rem; --t-8: 2.25rem;
-  --t-h1: clamp(1.7rem, 4.5vw, 2.6rem); --t-d1: clamp(2.2rem, 6vw, 3.6rem);
-  --serif: "Literata", Georgia, "Times New Roman", serif;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --t-1: var(--ju-t-1); --t-2: var(--ju-t-2); --t-3: var(--ju-t-3); --t-4: var(--ju-t-4); --t-5: var(--ju-t-5); --t-6: var(--ju-t-6);
+  --t-7: var(--ju-t-7); --t-8: var(--ju-t-8); --t-h1: var(--ju-t-h1); --t-d1: clamp(2.2rem, 6vw, 3.6rem);
+  --serif: var(--ju-serif);
+  --sans: var(--ju-sans);
+  --ju-wide: 1072px;  /* the family's bar lines up with the header's row */
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --page: #111318; --surface: #1b1e25; --ink: #f1f1ee; --ink-2: #a8adb8; --grid: #262a31; --axis: #4a505c; --mp-none: #3b3a38;
-  --border: #30343c; --link: #f1f1ee; --link-hover: #a8adb8;
+  --grid: #262a31; --axis: #4a505c; --mp-none: #3b3a38;
+  --link: #f1f1ee; --link-hover: #a8adb8;
   --brand: #111318; --brand-2: #f1f1ee; --on-brand: #f1f1ee; --button: #f1f1ee; --on-button: #111318;
   --accent: #c9c9c4; --accent-track: #2a2e36; --gold: #f1f1ee; --gold-ink: #f1f1ee;
   --critical: #ff8a65; --warn-track: #4a1f1a; --serious: #c4a7ff; --warning: #f2a33a; --records: #6cb4f0;
@@ -54,8 +56,8 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --page: #111318; --surface: #1b1e25; --ink: #f1f1ee; --ink-2: #a8adb8; --grid: #262a31; --axis: #4a505c; --mp-none: #3b3a38;
-    --border: #30343c; --link: #f1f1ee; --link-hover: #a8adb8;
+    --grid: #262a31; --axis: #4a505c; --mp-none: #3b3a38;
+    --link: #f1f1ee; --link-hover: #a8adb8;
     --brand: #111318; --brand-2: #f1f1ee; --on-brand: #f1f1ee; --button: #f1f1ee; --on-button: #111318;
     --accent: #c9c9c4; --accent-track: #2a2e36; --gold: #f1f1ee; --gold-ink: #f1f1ee;
     --critical: #ff8a65; --warn-track: #4a1f1a; --serious: #c4a7ff; --warning: #f2a33a; --records: #6cb4f0;
@@ -76,6 +78,11 @@ a:hover { color: var(--link-hover); }
 /* the first stop of the Tab key: past the menu to the page itself, out of sight until it has the focus */
 .skip { position: absolute; left: 8px; top: -4rem; z-index: 40; padding: .6rem 1rem; background: var(--button); color: var(--on-button); font-weight: 600; text-decoration: none; }
 .skip:focus { top: 8px; color: var(--on-button); }
+/* Javni uvid's bar (osnova.css): its edge on the header's, as .wrap's padding is; the family's mark drawn here, a
+   square's outline and a dot in the text's colour, as family.html's SVG */
+.ju-bar-in { max-width: calc(var(--ju-wide) + 48px); padding: 0 24px; }
+.ju-mark { box-sizing: border-box; width: .9em; height: .9em; margin: .075em; border: .105em solid currentColor; border-radius: .14em;
+  background: radial-gradient(circle, currentColor 0 .14em, transparent .15em); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
@@ -563,6 +570,7 @@ table.villages td b { font-weight: 600; }
 /* phones: big touch targets, one column */
 @media (max-width: 600px) {
   .wrap { padding: 0 16px; }
+  .ju-bar-in { padding: 0 16px; }
   h1 { font-size: var(--t-6); }
   h2 { font-size: var(--t-5); }
   .brand { font-size: var(--t-5); }

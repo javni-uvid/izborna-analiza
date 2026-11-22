@@ -6,6 +6,8 @@ from pathlib import Path
 import izbori
 
 CSS = (Path(izbori.__file__).parent / "static" / "site.css").read_text(encoding="utf-8")
+# the family's stylesheet, loaded before site.css, which takes its base colours, fonts and sizes (22 Nov 2026)
+OSNOVA = (Path(izbori.__file__).parents[2] / "osnova" / "design" / "osnova.css").read_text(encoding="utf-8")
 
 
 def test_letter_sizes_are_the_scale():
@@ -18,12 +20,21 @@ def test_letter_sizes_are_the_scale():
     # nor can the shorthand slip a size past it: the body's 16 px and the map's SVG labels only
     assert set(re.findall(r"font:\s*([\d.]+(?:rem|px))", CSS)) <= {"16px", "11px"}
     steps = dict(re.findall(r"--t-(\w+):\s*([^;]+);", CSS))
-    assert steps["3"] == "1rem"  # body text is 16 px
+    family = dict(re.findall(r"--ju-t-(\w+):\s*([^;]+);", OSNOVA))
+    assert all(steps[k] == f"var(--ju-t-{k})" for k in family)  # the family's scale, every step of it
+    assert family["3"] == "1rem"  # body text is 16 px
     assert "font: 16px/1.55" in CSS
 
 
-def _tokens(block: str) -> dict[str, str]:
-    return dict(re.findall(r"--([\w-]+):\s*(#[0-9a-fA-F]{6})", block))
+def _tokens(block: str, family: dict[str, str] | None = None) -> dict[str, str]:
+    """A block's colours; a value taken from the family's (var(--ju-…)) is read from osnova.css's `family`."""
+    found = dict(re.findall(r"--([\w-]+):\s*(#[0-9a-fA-F]{6}|var\(--ju-[\w-]+\))", block))
+    return {k: (family or {})[v[6:-1]] if v.startswith("var(") else v for k, v in found.items()
+            if not v.startswith("var(") or v[6:-1] in (family or {})}  # sizes and fonts aren't colours
+
+
+def _family(block: str) -> dict[str, str]:
+    return dict(re.findall(r"--(ju-[\w-]+):\s*(#[0-9a-fA-F]{6})", block))
 
 
 def _contrast(a: str, b: str) -> float:
@@ -38,10 +49,15 @@ def _contrast(a: str, b: str) -> float:
 def test_text_and_controls_have_contrast_in_both_themes():
     """WCAG 2.2 AA, from the tokens themselves: text 4.5:1 on the page and on the grey cards, a form control's
     edge 3:1, in the light theme and in both ways the dark one is chosen (the menu's toggle and the system's)."""
-    light = _tokens(CSS[CSS.index(":root {"):CSS.index(":root[data-theme=\"dark\"]")])
-    dark = _tokens(CSS[CSS.index(":root[data-theme=\"dark\"]"):CSS.index("@media (prefers-color-scheme: dark)")])
-    system = _tokens(CSS[CSS.index("@media (prefers-color-scheme: dark)"):CSS.index("* { box-sizing")])
+    fam_light = _family(OSNOVA[OSNOVA.index(":root {"):OSNOVA.index("@media (prefers-color-scheme: dark)")])
+    fam_dark = _family(OSNOVA[OSNOVA.index(":root[data-theme=\"dark\"]"):])
+    assert fam_dark == _family(OSNOVA[OSNOVA.index("@media (prefers-color-scheme: dark)"):OSNOVA.index(":root[data-theme=\"dark\"]")])
+    root = CSS[CSS.index(":root {"):CSS.index(":root[data-theme=\"dark\"]")]
+    light = _tokens(root, fam_light)
+    dark = _tokens(root, fam_dark) | _tokens(CSS[CSS.index(":root[data-theme=\"dark\"]"):CSS.index("@media (prefers-color-scheme: dark)")])
+    system = _tokens(root, fam_dark) | _tokens(CSS[CSS.index("@media (prefers-color-scheme: dark)"):CSS.index("* { box-sizing")])
     assert dark == system  # the two ways to the dark theme give the same colours
+    assert light["page"] == fam_light["ju-bg"] and dark["page"] == fam_dark["ju-bg"]  # the family's page
     text = [("ink", "page"), ("ink", "surface"), ("ink-2", "page"), ("ink-2", "surface"), ("link", "page"),
             ("critical", "page"), ("critical", "surface"), ("ink", "warn-track"), ("on-button", "button"),
             ("on-brand", "brand"), ("brick-accent", "brick"), ("sun", "ink-card"), ("accent", "page")]
@@ -65,12 +81,11 @@ def test_keyboard_and_motion():
 def test_fonts_are_served_from_the_site():
     """Principle 5: the stylesheets name no other host, and every font file they name is in static/fonts with
     its licence."""
-    static = Path(izbori.__file__).parent / "static"
-    fonts = (static / "fonts.css").read_text(encoding="utf-8")
-    assert "http" not in fonts + CSS.replace("http://www.w3.org/2000/svg", "")
-    for name in re.findall(r"url\(fonts/([^)]+)\)", fonts):
-        assert (static / "fonts" / name).exists(), name
-    assert (static / "fonts" / "OFL-Literata.txt").exists()
+    fonts = Path(izbori.__file__).parents[2] / "osnova" / "design" / "fonts"  # copied into static/fonts
+    assert "http" not in OSNOVA + CSS.replace("http://www.w3.org/2000/svg", "")
+    for name in re.findall(r"url\(fonts/([^)]+)\)", OSNOVA):
+        assert (fonts / name).exists(), name
+    assert (fonts / "OFL-Literata.txt").exists()
 
 
 BEACON = "https://static.cloudflareinsights.com/beacon.min.js"
@@ -102,3 +117,34 @@ def test_analytics_script(monkeypatch, tmp_path):
         assert outside == [BEACON], loc
         assert """data-cf-beacon='{"token": "abc123"}'""" in page, loc
         assert page.count("Cloudflare Web Analytics") == 2, loc  # the footer and the principle
+
+
+def test_family_bar_and_footer(tmp_path):
+    """Javni uvid's bar (22 Nov 2026, as zailiprotiv's): right after the skip link on every page, the family's name
+    leading to its page and every site of the family, this one marked as the current one and leading home; the
+    footer ends with the family's block. A Cyrillic page names them in Cyrillic and links the Cyrillic editions."""
+    import json
+
+    from izbori.history import Archive
+    from izbori.site import Site
+
+    fam = json.loads((Path(izbori.__file__).parents[2] / "osnova" / "design" / "sites.json").read_text(encoding="utf-8"))
+    site = Site(Archive(tmp_path / "data"), tmp_path / "out", None, "https://example.org/x/")
+    for loc, prefix, home in (("lat", "", "index.html"), ("cyr", "cyr/", "../cyr/index.html")):
+        site.write(loc, "about.html", "about.html")
+        page = (tmp_path / "out" / prefix / "about.html").read_text(encoding="utf-8")
+        body = page[page.index("<body>"):]
+        assert body.index('<a class="skip"') < body.index('<nav class="ju-bar"') < body.index('<header class="top">'), loc
+        bar = body[body.index('<nav class="ju-bar"'):body.index("</nav>")]
+        assert f'aria-label="{fam["family"]["name"][loc]}"' in bar, loc
+        assert f'<a class="ju-name" href="{fam["family"]["url"][loc]}">' in bar, loc
+        for s in fam["sites"]:
+            if s["id"] == "izborni-podaci":
+                assert f'<a aria-current="page" href="{home}">{s["name"][loc]}</a>' in bar, loc
+            else:
+                assert f'<a href="{s["url"][loc]}">{s["name"][loc]}</a>' in bar, loc
+        foot = page[page.index('<section class="ju-foot"'):]
+        assert foot.index("</section>") < foot.index("</footer>"), loc
+        assert fam["family"]["promise"][loc] in foot and f'{fam["family"]["url"][loc]}#nacela' in foot, loc
+        assert "<svg" not in bar and "<svg" not in foot[:foot.index("</section>")], loc  # the mark is drawn by CSS
+        assert '<link rel="stylesheet" href="' in page and "static/osnova.css" in page, loc
