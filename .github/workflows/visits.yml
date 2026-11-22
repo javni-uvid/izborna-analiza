@@ -1,4 +1,5 @@
-# By hand: what Cloudflare Web Analytics counted on the site (pages, where visitors came from, devices, hours).
+# By hand: what Cloudflare Web Analytics counted on the site (pages, where visitors came from, devices, hours),
+# and how fast the pages were for those who opened them (Core Web Vitals).
 # Sums only, and no row seen fewer than three times: this log is public. Reads only.
 name: visits
 
@@ -23,7 +24,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
-          sparse-checkout: tools/visits.py
+          sparse-checkout: |
+            tools/visits.py
+            tools/vitals.py
           sparse-checkout-cone-mode: false
       - name: Read
         env:
@@ -36,3 +39,16 @@ jobs:
             echo "::notice::not read: the secrets CLOUDFLARE_ANALYTICS_TOKEN and CLOUDFLARE_ACCOUNT_ID are not set"; exit 0
           fi
           python3 tools/visits.py "$HOURS"
+      # Each reading stands on its own: one that fails does not stop the other (as zailiprotiv's).
+      - name: How fast the pages are (Core Web Vitals)
+        if: ${{ !cancelled() }}
+        env:
+          CLOUDFLARE_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          HOURS: ${{ inputs.hours }}
+        run: |
+          case "$HOURS" in ''|*[!0-9]*) echo "::error::hours must be a number"; exit 1 ;; esac
+          if [ -z "$CLOUDFLARE_ANALYTICS_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::notice::not read: the secrets CLOUDFLARE_ANALYTICS_TOKEN and CLOUDFLARE_ACCOUNT_ID are not set"; exit 0
+          fi
+          python3 tools/vitals.py "$HOURS"

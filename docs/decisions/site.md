@@ -60,6 +60,9 @@ belongs to, in the same commit as the change. The principles and the rules of wo
     pending, and the zone holds only this site, so forgetting all of it costs nothing more.
   - Cloudflare Pages' free plan doesn't fit, with its limit of 20,000 files. Workers' paid plan (100,000 files) or
     a VPS are the fallback if the site outgrows 1 GB.
+  - AI crawlers, agents and assistants are allowed (22 Nov 2026, the maintainer's decision; unlike zailiprotiv,
+    which blocks training crawlers): Cloudflare's AI Crawl Control lets all through and the managed robots.txt adds
+    nothing.
 
 ## Design rules
 
@@ -376,3 +379,10 @@ against them.
   in `code_version`, so setting it rebuilds every page); the footer, the home page's "no tracking" and the about
   page's principle say so, and say otherwise without it. **visits** reads the counts by hand (`tools/visits.py`,
   from zailiprotiv's, asking only for this site's hosts).
+- **22 Nov 2026, how fast the pages are.** **visits** also prints Core Web Vitals as Cloudflare Web Analytics
+  measured them (`tools/vitals.py`, from zailiprotiv's): LCP, INP and CLS as shares of loads good, middling and poor,
+  by device and by kind of page in Latin and Cyrillic (home, municipality or city, polling station across elections,
+  polling place, a round's pages, Explore, the guide, the lists), since one of the site's 67,000 pages is seldom
+  opened often enough to say; for a kind under the line (good for fewer than 75% of loads) the elements Cloudflare
+  names. Sums only, no row measured fewer than 20 times; the two readings run as separate steps, so one failing
+  doesn't stop the other.
