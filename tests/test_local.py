@@ -358,9 +358,11 @@ def test_an_older_classification_is_read_again(tmp_path):
     assert seen == ["https://p.rs/a.pdf"] and local.load_store(tmp_path)["docs"]["https://p.rs/a.pdf"]["k"] == "boards"
 
 
-def test_overview_groups_a_municipality_s_documents_by_time(tmp_path):
+def test_overview_groups_a_municipality_s_documents_by_time(tmp_path, monkeypatch):
     import json
-    (tmp_path / "municipal_sites.csv").write_text("municipality_code,name,domain,note\n80373,Сечањ,s.rs,x\n",
+    from izbori import watch
+    monkeypatch.setattr(watch, "SITES", tmp_path / "municipalities.csv")
+    (tmp_path / "municipalities.csv").write_text("municipality_code,name,domain,note\n80373,Сечањ,s.rs,x\n",
                                                   encoding="utf-8")
     docs = {f"https://s.rs/2025/11/BM-{n}.pdf": {"m": "80373", "k": "boards", "e": "local", "d": "2025-11-19"}
             for n in range(5)}
