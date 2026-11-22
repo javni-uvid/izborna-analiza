@@ -149,3 +149,28 @@ def test_family_bar_and_footer(tmp_path):
         assert fam["family"]["promise"][loc] in foot and f'{fam["family"]["url"][loc]}#nacela' in foot, loc
         assert "<svg" not in bar and "<svg" not in foot[:foot.index("</section>")], loc  # the mark is drawn by CSS
         assert '<link rel="stylesheet" href="' in page and "static/osnova.css" in page, loc
+
+
+def test_the_mark_and_the_icons(tmp_path):
+    """The site's mark (22 Nov 2026, the maintainer's choice of three drafts): left of the name in the header,
+    decorative (the link's name stays the site's), drawn by the stylesheet; every page links the favicon set and the
+    picture a shared link shows, whose files the build puts at the root."""
+    from izbori.history import Archive
+    from izbori.site import HERE, Site
+
+    site = Site(Archive(tmp_path / "data"), tmp_path / "out", None, "https://example.org/x/")
+    for loc, prefix, name in (("lat", "", "Izborni podaci"), ("cyr", "cyr/", "Изборни подаци")):
+        site.write(loc, "about.html", "about.html")
+        page = (tmp_path / "out" / prefix / "about.html").read_text(encoding="utf-8")
+        brand = re.search(r'<a class="brand" href="[^"]+">(.*?)</a>', page).group(1)
+        assert brand == f'<span class="brand-mark" aria-hidden="true"></span>{name}', loc
+        up = "../" if prefix else ""
+        for tag in (f'<link rel="icon" type="image/svg+xml" href="{up}favicon.svg">',
+                    f'<link rel="icon" type="image/png" sizes="96x96" href="{up}favicon-96.png">',
+                    f'<link rel="apple-touch-icon" href="{up}apple-touch-icon.png">',
+                    '<meta property="og:image" content="https://example.org/x/og-image.png">'):
+            assert tag in page, (loc, tag)
+    for f in ("favicon.svg", "favicon.ico", "favicon-96.png", "apple-touch-icon.png", "logo.png", "og-image.png"):
+        assert (HERE / "root" / f).stat().st_size < 50_000, f  # small: a favicon is asked for on every visit
+    assert re.search(r"\.brand-mark \{[^}]*url\(brand-mark\.svg\)", CSS) and "url(brand-mark-dark.svg)" in CSS
+    assert (HERE / "static" / "brand-mark.svg").exists() and (HERE / "static" / "brand-mark-dark.svg").exists()

@@ -747,3 +747,23 @@ def test_sitemap_and_robots(site):
     listed = {r + "index.html" if r == "" or r.endswith("/") else r for r in listed}
     assert listed == pages - redirects - {"404.html"}
     assert redirects, "the fixture's site has redirects, so leaving them out is tested"
+
+
+def test_every_page_has_the_mark(site):
+    """Every page but a redirect has the mark in its header and links the favicon set; the files are at the root;
+    the home page says who publishes the site, with its logo, as schema.org data (22 Nov 2026)."""
+    out = site
+    for f in ("favicon.svg", "favicon.ico", "favicon-96.png", "apple-touch-icon.png", "logo.png", "og-image.png"):
+        assert (out / f).exists(), f
+    pages = [f for f in out.rglob("*.html") if 'http-equiv="refresh"' not in f.read_text(encoding="utf-8")[:600]]
+    assert len(pages) > 1000
+    for f in pages:
+        text = f.read_text(encoding="utf-8")
+        assert '<span class="brand-mark" aria-hidden="true"></span>' in text, f
+        assert 'favicon.svg"' in text and 'favicon-96.png"' in text and 'apple-touch-icon.png"' in text, f
+    for prefix, name in (("", "Izborni podaci"), ("cyr/", "Изборни подаци")):
+        home = (out / prefix / "index.html").read_text(encoding="utf-8")
+        ld = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', home, re.S).group(1))
+        org = next(n for n in ld["@graph"] if n["@type"] == "Organization")
+        assert org["name"] == name and org["logo"] == "https://example.org/x/logo.png", prefix
+

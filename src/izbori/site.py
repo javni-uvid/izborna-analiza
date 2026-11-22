@@ -86,7 +86,9 @@ class Site:
                   "current": other == loc, "lang": LANG_ATTR[other]} for other in BUILT]
         return {
             "loc": loc, "lang": LANG_ATTR[loc], "root": root, "link": link, "langs": langs, "page": page,
-            "site_host": self.site_url.split("://", 1)[-1].rstrip("/"),
+            "site_host": self.site_url.split("://", 1)[-1].rstrip("/"), "site_url": self.site_url,
+            # JSON-LD as text the Latin pages transliterate (tojson would write \u escapes), its `</` broken
+            "ld": lambda obj: Markup(json.dumps(obj, ensure_ascii=False).replace("</", "<\\/")),
             "mun_href": lambda code: link(self.slugs[code] + "/") if code in getattr(self, "slugs", {}) else link(f"m/{code}.html"),
             "city_href": lambda slug: link(slug + "/"),
             "local_report": self.local_report,
@@ -1003,6 +1005,11 @@ class Site:
                 (self.out / rel).parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(f, self.out / rel)
                 self.produced.add(rel)
+        # the mark's files the browsers and search engines look for at the root (favicon.ico, apple-touch-icon.png)
+        # and the picture a shared link shows, drawn by tools/icons.py (22 Nov 2026)
+        for f in sorted((HERE / "root").iterdir()):
+            shutil.copyfile(f, self.out / f.name)
+            self.produced.add(f.name)
         # pages are recorded by their POSIX path, on Windows too (20 Nov 2026: finish() took r\680072\index.html
         # for a page no build produced, and removed every page in a folder)
         self.produced.update(f.relative_to(self.out).as_posix() for f in (self.out / "static").rglob("*")

@@ -426,3 +426,28 @@ against them.
   purpose this differs from `osnova/design/`, where the family shares its base colours. The bar keeps the
   family's colours, so it is drawn the same on every site of the family. `tests/test_design.py` checks the navy
   values and every contrast pair (all pass AA in both themes, as they did before #14).
+- **22 Nov 2026, the site's mark (the maintainer's choice of three drafts).** Three marks were drawn in the navy
+  and gold: a ballot box with a slip going in, a pen's circle around a dot, and three rising bars. Each was shown in
+  the header at 1280 and 320 px, light and dark, in a browser's tab at 16 and 32 px, and in a search result. The
+  maintainer chose the box. It stands left of the name in every page's header, white on the navy, with the slip in
+  the theme's gold.
+  - **In the header:** a `<span class="brand-mark" aria-hidden="true">` that the stylesheet draws from
+    `static/brand-mark.svg` (`-dark.svg` for the dark theme's gold). It is some 50 bytes a page rather than an
+    inline SVG, and the link's name stays the site's.
+  - **At the root:** the build copies `src/izbori/root/` there, as zailiprotiv wires its own: `favicon.svg` (navy,
+    its own colours in a dark scheme), `favicon.ico` (16/32/48, which browsers ask for by themselves) and
+    `favicon-96.png` (Google shows no SVG), both on a navy tile so they read on any background;
+    `apple-touch-icon.png` (180, opaque); `logo.png` (512); and `og-image.png` (1200×630, the mark, the name and
+    the promise), which every page names as `og:image`.
+  - **The home page** says who publishes the site, as schema.org WebSite and Organization data with `logo.png` and
+    Javni uvid as the parent organization. It is written as plain JSON, so the Latin page transliterates it, with
+    its `</` broken.
+  - `tools/icons.py` draws every file from the one mark. The files are under `src/izbori/`, so they count in the
+    code's version, and the build lists them as produced.
+  - No web manifest: the site is not an app to install.
+  - **The header's row:** the gap went from 28 to 20 px, so the mark fits at 1280 px. On phones the name is smaller
+    (18 px under 380 px, 16 px for the wider Cyrillic name), so the name, the mark, the search and the language
+    button stay on one row at 320 and 390 px, with the tabs below. The Cyrillic tabs take their short names under
+    1400 px, so the Cyrillic row no longer wraps at 1280 px (it did before).
+  - **Size:** the test site went from 51.7 to 53.0 MB, some 470 bytes a page (the icons' links, the `og:image`
+    tags, the span). For the whole site that is some +9 MB.
