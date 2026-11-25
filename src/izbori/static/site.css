@@ -586,7 +586,8 @@ table.villages td b { font-weight: 600; }
   h1 { font-size: var(--t-6); }
   h2 { font-size: var(--t-5); }
   .brand { font-size: var(--t-5); gap: .35em; }
-  .top-row { gap: 0 8px; }
+  /* .wrap above takes the row's own room away; some of it back, so nothing stands at the screen's very edge */
+  .top-row { gap: 0 8px; padding-top: 6px; }
   /* the six tabs wrap rather than scroll: a tab cut off at the screen's edge looked like none (20 Nov 2026) */
   .main-nav { order: 3; width: 100%; gap: 0 16px; flex-wrap: wrap; white-space: nowrap; }
   .main-nav a, .main-nav a[data-short]::after { font-size: var(--t-2); }
