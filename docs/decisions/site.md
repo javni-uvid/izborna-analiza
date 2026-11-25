@@ -451,3 +451,7 @@ against them.
     1400 px, so the Cyrillic row no longer wraps at 1280 px (it did before).
   - **Size:** the test site went from 51.7 to 53.0 MB, some 470 bytes a page (the icons' links, the `og:image`
     tags, the span). For the whole site that is some +9 MB.
+- **25 Nov 2026, the header's row keeps room above it on a phone (zailiprotiv's conductor, with javni-uvid/osnova#10).** At
+  600 px and less `.wrap`'s padding took the row's own away, so the search and the language's round switch stood right
+  under the family's bar; when osnova takes the bar off a phone's top (its sites stand in the footer's block), they would
+  stand at the screen's very edge. 6 px; the same with the bar and without it.
