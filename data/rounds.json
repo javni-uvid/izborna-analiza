@@ -18,5 +18,10 @@
   "kind": "parliamentary",
   "name": "Парламентарни 2026",
   "type": 2
+ },
+ "824732": {
+  "kind": "presidential",
+  "name": "Председнички 2026",
+  "type": 1
  }
 }
